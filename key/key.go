@@ -4,6 +4,7 @@ package key
 //import "fmt"
 import "math"
 import "encoding/binary"
+import "encoding/base64"
 
 type Key []byte
 
@@ -26,4 +27,11 @@ func Uint64Slice(k Key) []uint64 {
     result[i/step] = binary.LittleEndian.Uint64(tmp)
   }
   return (result)
+}
+
+func KeyToString(k Key) string {
+
+  s := base64.StdEncoding.EncodeToString(k)
+
+  return (s)
 }

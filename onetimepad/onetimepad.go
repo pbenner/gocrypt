@@ -13,6 +13,10 @@ type OneTimePad struct
   privateKey Key
 }
 
+func (cipher *OneTimePad) GetKey() Key {
+  return (cipher.privateKey)
+}
+
 func (cipher *OneTimePad) Generate(n ...int) {
 
   length := 8;
