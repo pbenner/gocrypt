@@ -1,14 +1,12 @@
 package onetimepad
 
 //import "fmt"
-import "encoding/binary"
 import "math/rand"
 import "time"
 import "github.com/seehuhn/mt19937"
 
-import . "github.com/pbenner/0100101101/cipher"
-
-const KeyLength = 8
+import . "github.com/pbenner/0100101101/key"
+import . "github.com/pbenner/0100101101/message"
 
 type OneTimePad struct
 {
@@ -17,11 +15,16 @@ type OneTimePad struct
 
 func (cipher *OneTimePad) Generate(n ...int) {
 
-  if len(n) != 0 {
+  length := 8;
+
+  if len(n) > 1 {
     panic("Generate(): Invalid argument")
   }
+  if len(n) == 1 {
+    length = n[0]
+  }
 
-  cipher.privateKey= make(Key, KeyLength)
+  cipher.privateKey= make(Key, length)
 
   rng := rand.New(mt19937.New())
   rng.Seed(time.Now().UnixNano())
@@ -34,12 +37,14 @@ func (cipher *OneTimePad) Generate(n ...int) {
 func (cipher *OneTimePad) Encrypt(m Message) Message {
 
   result := make(Message, len(m))
+  length := len(cipher.privateKey)
 
-  if (len(cipher.privateKey) != KeyLength) {
+  if (len(cipher.privateKey) != length) {
     panic("No private key available!")
   }
-  rng := rand.New(mt19937.New())
-  rng.Seed(int64(binary.LittleEndian.Uint64(cipher.privateKey[0:KeyLength])))
+  mt  := mt19937.New()
+  mt.SeedFromSlice(Uint64Slice(cipher.privateKey))
+  rng := rand.New(mt)
 
   for i := 0; i < len(m); i++ {
     result[i] = m[i] ^ byte(rng.Int())

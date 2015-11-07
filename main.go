@@ -2,12 +2,14 @@ package main
 
 import   "fmt"
 import . "github.com/pbenner/0100101101/cipher"
+//import . "github.com/pbenner/0100101101/key"
+import . "github.com/pbenner/0100101101/message"
 import . "github.com/pbenner/0100101101/onetimepad"
 
 
 func f(cipher Cipher) Cipher {
 
-  cipher.Generate();
+  cipher.Generate(64);
   m := Message("Hello World!")
   a := cipher.Encrypt(m)
   b := cipher.Decrypt(a)

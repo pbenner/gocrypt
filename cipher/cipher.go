@@ -1,7 +1,6 @@
 package cipher
 
-type Key []byte
-type Message []byte
+import . "github.com/pbenner/0100101101/message"
 
 type Cipher interface
 {
