@@ -5,6 +5,7 @@ import . "github.com/pbenner/0100101101/cipher"
 import . "github.com/pbenner/0100101101/key"
 import . "github.com/pbenner/0100101101/message"
 import . "github.com/pbenner/0100101101/onetimepad"
+import . "github.com/pbenner/0100101101/io"
 
 
 func f(cipher Cipher) Cipher {
@@ -26,7 +27,7 @@ func main() {
   cipher := OneTimePad{};
   cipher.Generate(1024);
 
-  fmt.Println(KeyToString(cipher.GetKey()));
+  fmt.Println(CodeBlock(KeyToString(cipher.GetKey())));
 
   f(&cipher)
 
