@@ -13,7 +13,7 @@ func Uint64Slice(k Key) []uint64 {
   const step int = 8;
 
   length := int(math.Ceil(float64(len(k))/float64(step)))
-  tmp    := make([]byte,   step);
+  tmp    := make([]byte,   step)
   result := make([]uint64, length)
 
   for i := 0; i < len(k); i += step {
