@@ -23,19 +23,25 @@ import "math/rand"
 
 /* -------------------------------------------------------------------------- */
 
-type Permutation struct
+type PermutationCipher struct
 {
   forwardKey Key
   reverseKey Key
 }
 
+func NewPermutationCipher() PermutationCipher {
+  cipher := PermutationCipher{}
+  cipher.Generate()
+  return cipher
+}
+
 /* -------------------------------------------------------------------------- */
 
-func (cipher *Permutation) GetKey() Key {
+func (cipher *PermutationCipher) GetKey() Key {
   return cipher.forwardKey
 }
 
-func (cipher *Permutation) Generate(_n ...int) {
+func (cipher *PermutationCipher) Generate(_n ...int) {
   n := int(math.Pow(2, 8))
   cipher.forwardKey = NewKey(n)
   cipher.reverseKey = NewKey(n)
@@ -46,7 +52,7 @@ func (cipher *Permutation) Generate(_n ...int) {
   }
 }
 
-func (cipher *Permutation) Encrypt(m Message) Message {
+func (cipher *PermutationCipher) Encrypt(m Message) Message {
 
   result := NewMessage(len(m))
   length := len(cipher.forwardKey)
@@ -62,7 +68,7 @@ func (cipher *Permutation) Encrypt(m Message) Message {
   return result
 }
 
-func (cipher *Permutation) Decrypt(m Message) Message {
+func (cipher *PermutationCipher) Decrypt(m Message) Message {
 
   result := NewMessage(len(m))
   length := len(cipher.forwardKey)

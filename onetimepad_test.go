@@ -26,8 +26,7 @@ import "testing"
 
 func TestOneTimePad(t *testing.T) {
 
-  cipher := OneTimePad{};
-  cipher.Generate(1024);
+  cipher := NewOneTimePad(1024);
 
   m := Message("Hello World!")
   a := cipher.Encrypt(m)

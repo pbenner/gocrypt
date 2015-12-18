@@ -30,6 +30,15 @@ type OneTimePad struct
   privateKey Key
 }
 
+/* constructors
+ * -------------------------------------------------------------------------- */
+
+func NewOneTimePad(keyLength int) OneTimePad {
+  cipher := OneTimePad{}
+  cipher.Generate(keyLength)
+  return cipher
+}
+
 /* -------------------------------------------------------------------------- */
 
 func (cipher *OneTimePad) GetKey() Key {

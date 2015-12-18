@@ -24,17 +24,16 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestPermutation(t *testing.T) {
+func TestPermutationCipher(t *testing.T) {
 
-  cipher := Permutation{}
-  cipher.Generate()
+  cipher := NewPermutationCipher()
 
   m := Message("Hello World!")
   a := cipher.Encrypt(m)
   b := cipher.Decrypt(a)
 
   if strings.Compare(m.String(), b.String()) != 0 {
-    t.Error("Permutation cipher test failed!")
+    t.Error("PermutationCipher cipher test failed!")
   }
 
 }
