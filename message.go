@@ -18,6 +18,10 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
+import "encoding/base64"
+
+/* -------------------------------------------------------------------------- */
+
 type Message []byte
 
 /* constructors
@@ -32,4 +36,8 @@ func NewMessage(n int) Message {
 
 func (m Message) String() string {
   return string(m)
+}
+
+func (m Message) Base64String() string {
+  return base64.StdEncoding.EncodeToString(m)
 }
