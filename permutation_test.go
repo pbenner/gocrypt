@@ -33,7 +33,7 @@ func TestPermutationCipher(t *testing.T) {
   b := cipher.Decrypt(a)
 
   if strings.Compare(m.String(), b.String()) != 0 {
-    t.Error("PermutationCipher cipher test failed!")
+    t.Error("PermutationCipher test failed!")
   }
 
 }
