@@ -54,7 +54,7 @@ func (cipher *PermutationCipher) Generate(_n ...int) {
 
 func (cipher *PermutationCipher) Encrypt(m Message) Message {
 
-  result := NewMessage(len(m))
+  result := NullMessage(len(m))
   length := len(cipher.forwardKey)
 
   if len(cipher.forwardKey) != length {
@@ -70,7 +70,7 @@ func (cipher *PermutationCipher) Encrypt(m Message) Message {
 
 func (cipher *PermutationCipher) Decrypt(m Message) Message {
 
-  result := NewMessage(len(m))
+  result := NullMessage(len(m))
   length := len(cipher.forwardKey)
 
   if len(cipher.forwardKey) != length {
@@ -82,4 +82,15 @@ func (cipher *PermutationCipher) Decrypt(m Message) Message {
   }
 
   return result
+}
+
+/* utility
+ * -------------------------------------------------------------------------- */
+
+func (cipher *PermutationCipher) Swap(j1, j2 int) {
+  k1, k2 := cipher.forwardKey[j1], cipher.forwardKey[j2]
+  cipher.forwardKey[j1], cipher.forwardKey[j2] =
+    cipher.forwardKey[j2], cipher.forwardKey[j1]
+  cipher.reverseKey[k1], cipher.reverseKey[k2] =
+    cipher.reverseKey[k2], cipher.reverseKey[k1]
 }

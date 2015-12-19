@@ -27,7 +27,10 @@ type Message []byte
 /* constructors
  * -------------------------------------------------------------------------- */
 
-func NewMessage(n int) Message {
+func NewMessage(text string) Message {
+  return Message(text)
+}
+func NullMessage(n int) Message {
   return make(Message, n)
 }
 

@@ -68,7 +68,7 @@ func (cipher *OneTimePad) Generate(n ...int) {
 
 func (cipher *OneTimePad) Encrypt(m Message) Message {
 
-  result := NewMessage(len(m))
+  result := NullMessage(len(m))
   length := len(cipher.privateKey)
 
   if len(cipher.privateKey) != length {
