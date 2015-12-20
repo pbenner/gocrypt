@@ -20,7 +20,7 @@ package lib
 
 type Cipher interface
 {
-  Generate(n ...int)
+  Generate(args ...interface{})
   Encrypt(m Message) Message
   Decrypt(m Message) Message
 }

@@ -35,20 +35,42 @@ func NewPermutationCipher() PermutationCipher {
   return cipher
 }
 
+func NewAsciiPermutationCipher(alphabet AsciiAlphabet) PermutationCipher {
+  cipher := PermutationCipher{}
+  cipher.Generate(alphabet)
+  return cipher
+}
+
 /* -------------------------------------------------------------------------- */
 
 func (cipher *PermutationCipher) GetKey() Key {
   return cipher.forwardKey
 }
 
-func (cipher *PermutationCipher) Generate(_n ...int) {
+func (cipher *PermutationCipher) Generate(args ...interface{}) {
+  i := 0
+  j := 255
+  // permutation of the full byte range
   n := int(math.Pow(2, 8))
-  cipher.forwardKey = NewKey(n)
-  cipher.reverseKey = NewKey(n)
+  // if an alphabet is given as an argument, restrict the
+  // permutation range accordingly
+  if len(args) == 1 {
+    alphabet := args[0].(AsciiAlphabet)
+    i = alphabet.i
+    j = alphabet.j
+    n = j - i + 1
+  }
+  cipher.forwardKey = NewKey(256)
+  cipher.reverseKey = NewKey(256)
   p := rand.Perm(n)
-  for i := 0; i < n; i++ {
-    cipher.forwardKey[  i ] = byte(p[i])
-    cipher.reverseKey[p[i]] = byte(i)
+  for k := 0; k < 256; k++ {
+    if k >= i && k <= j {
+      cipher.forwardKey[k]        = byte(i+p[k-i])
+      cipher.reverseKey[i+p[k-i]] = byte(k)
+    } else {
+      cipher.forwardKey[k] = byte(k)
+      cipher.reverseKey[k] = byte(k)
+    }
   }
 }
 

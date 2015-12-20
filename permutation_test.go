@@ -37,3 +37,17 @@ func TestPermutationCipher(t *testing.T) {
   }
 
 }
+
+func TestAsciiPermutationCipher(t *testing.T) {
+
+  cipher := NewAsciiPermutationCipher(RstAsciiAlphabet)
+
+  m := Message("Hello World!")
+  a := cipher.Encrypt(m)
+  b := cipher.Decrypt(a)
+
+  if strings.Compare(m.String(), b.String()) != 0 {
+    t.Error("PermutationCipher test failed!")
+  }
+
+}

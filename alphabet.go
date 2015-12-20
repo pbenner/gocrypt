@@ -18,30 +18,11 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-import "encoding/base64"
+type AsciiAlphabet struct {
+  i, j int
+}
 
 /* -------------------------------------------------------------------------- */
 
-type Message []byte
-
-/* constructors
- * -------------------------------------------------------------------------- */
-
-func NewMessage(text string) Message {
-  return Message(text)
-}
-
-func NullMessage(n int) Message {
-  return make(Message, n)
-}
-
-/* type conversion
- * -------------------------------------------------------------------------- */
-
-func (m Message) String() string {
-  return string(m)
-}
-
-func (m Message) Base64String() string {
-  return base64.StdEncoding.EncodeToString(m)
-}
+var StdAsciiAlphabet AsciiAlphabet = AsciiAlphabet{ 0, 255}
+var RstAsciiAlphabet AsciiAlphabet = AsciiAlphabet{41, 176}

@@ -45,15 +45,15 @@ func (cipher *OneTimePad) GetKey() Key {
   return cipher.privateKey
 }
 
-func (cipher *OneTimePad) Generate(n ...int) {
+func (cipher *OneTimePad) Generate(args ...interface{}) {
 
   length := 8;
 
-  if len(n) > 1 {
+  if len(args) > 1 {
     panic("Generate(): Invalid argument")
   }
-  if len(n) == 1 {
-    length = n[0]
+  if len(args) == 1 {
+    length = args[0].(int)
   }
 
   cipher.privateKey= make(Key, length)
