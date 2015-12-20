@@ -44,6 +44,7 @@ func readFile(filename string) string {
   scanner := bufio.NewScanner(f)
   for scanner.Scan() {
     text.WriteString(scanner.Text())
+    text.WriteString(" ")
   }
 
   return text.String()
@@ -54,6 +55,7 @@ func readFile(filename string) string {
 func runSampler(n int, trainingFile, textFile string, verbose bool) {
 
   // get a new random cipher
+//  alphabet := StdAsciiAlphabet
   alphabet := RstAsciiAlphabet
   cipher1  := NewAsciiPermutationCipher(alphabet)
 

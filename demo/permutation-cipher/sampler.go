@@ -41,10 +41,11 @@ func sampler(n int, alphabet AsciiAlphabet, ciphertext Message, t Matrix, verbos
 
   s := rand.NewSource(time.Now().UnixNano())
   r := rand.New(s)
+  l := alphabet.Getj()-alphabet.Geti()+1
 
   cipher := NewAsciiPermutationCipher(alphabet)
 
-  for i := 0; i < n*int(math.Pow(2, 8)); i++ {
+  for i := 0; i < n*l; i++ {
     j1, j2 := proposal(alphabet, r)
     text1 := cipher.Decrypt(ciphertext)
     cipher.Swap(j1, j2)

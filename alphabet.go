@@ -35,5 +35,5 @@ func (alphabet AsciiAlphabet) Getj() int {
 
 /* -------------------------------------------------------------------------- */
 
-var StdAsciiAlphabet AsciiAlphabet = AsciiAlphabet{ 0, 255}
+var StdAsciiAlphabet AsciiAlphabet = AsciiAlphabet{32, 126}
 var RstAsciiAlphabet AsciiAlphabet = AsciiAlphabet{65, 122}
