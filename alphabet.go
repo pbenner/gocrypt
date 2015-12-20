@@ -22,6 +22,17 @@ type AsciiAlphabet struct {
   i, j int
 }
 
+/* field access
+ * -------------------------------------------------------------------------- */
+
+func (alphabet AsciiAlphabet) Geti() int {
+  return alphabet.i
+}
+
+func (alphabet AsciiAlphabet) Getj() int {
+  return alphabet.j
+}
+
 /* -------------------------------------------------------------------------- */
 
 var StdAsciiAlphabet AsciiAlphabet = AsciiAlphabet{ 0, 255}
