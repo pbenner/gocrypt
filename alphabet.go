@@ -25,4 +25,4 @@ type AsciiAlphabet struct {
 /* -------------------------------------------------------------------------- */
 
 var StdAsciiAlphabet AsciiAlphabet = AsciiAlphabet{ 0, 255}
-var RstAsciiAlphabet AsciiAlphabet = AsciiAlphabet{41, 176}
+var RstAsciiAlphabet AsciiAlphabet = AsciiAlphabet{65, 122}
