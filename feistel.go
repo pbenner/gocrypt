@@ -58,11 +58,16 @@ func (network FeistelNetwork) EncryptBlock(input, output []byte) {
   Li := output[0:n/2]
   Ri := output[n/2:n]
   // let j = i+1
+  Lj := input[0:n/2]
   Rj := input[n/2:n]
   // apply encryption multiple times
   for i := 0; i < network.Rounds; i++ {
     // switch input and output
-    input, output = output, input
+    Li, Ri, Lj, Rj = Lj, Rj, Li, Ri
+    // copy Ri to Lj
+    for k := 0; k < len(Ri); k++ {
+      Lj[k] = Ri[k]
+    }
     // get the ith key
     key := network.K(i)
     // call F function
