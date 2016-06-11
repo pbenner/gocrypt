@@ -52,7 +52,7 @@ func NewFeistelNetwork(round, blockLength int, k Kfunc, f Ffunc) FeistelNetwork 
   return FeistelNetwork{round, blockLength, k, f, fout}
 }
 
-func (network FeistelNetwork) EncryptBlock(input, output []byte) {
+func (network FeistelNetwork) encryptBlock(input, output []byte) {
   n := len(input)
   // variables at the end of a round
   Li := output[0:n/2]
@@ -79,11 +79,15 @@ func (network FeistelNetwork) EncryptBlock(input, output []byte) {
 
 func (network FeistelNetwork) Encrypt(input []byte) []byte {
   l := network.BlockLength
+  inTmp  := make([]byte, l)
+  // allocate memory for holding the output
   output := make([]byte, len(input))
+  // make a copy the input since EncryptBlock 
   for i := 0; i < len(input); i += l {
     iBlock := input [i:i+l]
     oBlock := output[i:i+l]
-    network.EncryptBlock(iBlock, oBlock)
+    copy(inTmp, iBlock)
+    network.encryptBlock(inTmp, oBlock)
   }
   return output
 }
