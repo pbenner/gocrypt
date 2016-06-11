@@ -23,13 +23,13 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestBitmap(t *testing.T) {
+func TestBitPermuation(t *testing.T) {
 
   table := []int{
     0, 1, 9, 3, 4, 5, 6, 7,
     8, 2,10,11,12,13,14,15}
   input  := []byte{4,0}
-  output := remapBits(input, table)
+  output := PermuteBits(input, table)
 
   if output[0] != 0 {
     t.Error("bitmap test failed")

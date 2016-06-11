@@ -22,7 +22,7 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-func remapBits(input []byte, table []int) []byte {
+func PermuteBits(input []byte, table []int) []byte {
   // number of input bits
   n := 8*len(input)
   // check if table is long enough
