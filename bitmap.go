@@ -34,8 +34,29 @@ func PermuteBits(input []byte, table []int) []byte {
   for i := 0; i < n; i++ {
     // index of the output bit
     j := table[i]
-    if input[i/8] & byte(1 << byte(i % 8)) != 0 {
+    if input[i/8]  & byte(1 << byte(i % 8)) != 0 {
       output[j/8] |= byte(1 << byte(j % 8))
+    }
+  }
+  return output
+}
+
+func RemapBits(input []byte, table [][]int) []byte {
+  // number of input bits
+  n := 8*len(input)
+  // check if table is long enough
+  if len(table) != n {
+    panic("table has invalid length")
+  }
+  output := make([]byte, len(input))
+  // loop over input bits
+  for i := 0; i < n; i++ {
+    for k := 0; k < len(table[i]); k++ {
+      // index of the output bit
+      j := table[i][k]
+      if input[i/8]  & byte(1 << byte(i % 8)) != 0 {
+        output[j/8] |= byte(1 << byte(j % 8))
+      }
     }
   }
   return output
