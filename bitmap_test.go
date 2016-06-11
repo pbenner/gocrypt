@@ -19,6 +19,7 @@ package lib
 /* -------------------------------------------------------------------------- */
 
 //import "fmt"
+//import "strconv"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
@@ -39,4 +40,42 @@ func TestBitPermuation(t *testing.T) {
   if output[1] != 2 {
     t.Error("bitmap test failed")
   }
+}
+
+func TestBitMap(t *testing.T) {
+
+  input  := []byte{0,0,1,1<<7}
+  output := []byte{0,0,0,0,0,0}
+
+  fExpansion(input, output)
+
+  if output[0] != 1 {
+    t.Error("bitmap test failed")
+  }
+  if output[1] != 0 {
+    t.Error("bitmap test failed")
+  }
+  if output[2] != (1<<7) {
+    t.Error("bitmap test failed")
+  }
+  if output[3] != (1<<1) {
+    t.Error("bitmap test failed")
+  }
+  if output[4] != 0 {
+    t.Error("bitmap test failed")
+  }
+  if output[5] != (1<<6) {
+    t.Error("bitmap test failed")
+  }
+  // fmt.Println("input[0]:", strconv.FormatInt(int64(input[0]), 2))
+  // fmt.Println("input[1]:", strconv.FormatInt(int64(input[1]), 2))
+  // fmt.Println("input[2]:", strconv.FormatInt(int64(input[2]), 2))
+  // fmt.Println("input[3]:", strconv.FormatInt(int64(input[3]), 2))
+
+  // fmt.Println("output[0]:", strconv.FormatInt(int64(output[0]), 2))
+  // fmt.Println("output[1]:", strconv.FormatInt(int64(output[1]), 2))
+  // fmt.Println("output[2]:", strconv.FormatInt(int64(output[2]), 2))
+  // fmt.Println("output[3]:", strconv.FormatInt(int64(output[3]), 2))
+  // fmt.Println("output[4]:", strconv.FormatInt(int64(output[4]), 2))
+  // fmt.Println("output[5]:", strconv.FormatInt(int64(output[5]), 2))
 }
