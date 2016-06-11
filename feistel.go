@@ -41,18 +41,16 @@ type FeistelNetwork struct {
   BlockLength int // block length in bytes
   K           Kfunc
   F           Ffunc
-  Fout        []byte
 }
 
 /* -------------------------------------------------------------------------- */
 
 func NewFeistelNetwork(round, blockLength int, k Kfunc, f Ffunc) FeistelNetwork {
   // result of the F function
-  fout := make([]byte, blockLength/2)
-  return FeistelNetwork{round, blockLength, k, f, fout}
+  return FeistelNetwork{round, blockLength, k, f}
 }
 
-func (network FeistelNetwork) encryptBlock(input, output []byte) {
+func (network FeistelNetwork) encryptBlock(input, output, fTmp []byte) {
   n := len(input)
   // variables at the end of a round
   Li := output[0:n/2]
@@ -71,23 +69,25 @@ func (network FeistelNetwork) encryptBlock(input, output []byte) {
     // get the ith key
     key := network.K(i)
     // call F function
-    network.F(key, Ri, network.Fout)
+    network.F(key, Ri, fTmp)
     // encrypte Li and store result in Rj
-    xorSlice(Li, network.Fout, Rj)
+    xorSlice(Li, fTmp, Rj)
   }
 }
 
 func (network FeistelNetwork) Encrypt(input []byte) []byte {
   l := network.BlockLength
-  inTmp  := make([]byte, l)
+  // allocate some memory for holding temporary data
+  iTmp := make([]byte, l)
+  fTmp := make([]byte, l/2)
   // allocate memory for holding the output
   output := make([]byte, len(input))
   // make a copy the input since EncryptBlock 
   for i := 0; i < len(input); i += l {
     iBlock := input [i:i+l]
     oBlock := output[i:i+l]
-    copy(inTmp, iBlock)
-    network.encryptBlock(inTmp, oBlock)
+    copy(iTmp, iBlock)
+    network.encryptBlock(iTmp, oBlock, fTmp)
   }
   return output
 }
