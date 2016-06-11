@@ -22,14 +22,13 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-func PermuteBits(input []byte, table []int) []byte {
+func PermuteBits(input, output []byte, table []int) {
   // number of input bits
   n := 8*len(input)
   // check if table is long enough
   if len(table) != n {
     panic("table has invalid length")
   }
-  output := make([]byte, len(input))
   // loop over input bits
   for i := 0; i < n; i++ {
     // index of the output bit
@@ -38,17 +37,15 @@ func PermuteBits(input []byte, table []int) []byte {
       output[j/8] |= byte(1 << byte(j % 8))
     }
   }
-  return output
 }
 
-func RemapBits(input []byte, table [][]int) []byte {
+func RemapBits(input, output []byte, table [][]int) {
   // number of input bits
   n := 8*len(input)
   // check if table is long enough
   if len(table) != n {
     panic("table has invalid length")
   }
-  output := make([]byte, len(input))
   // loop over input bits
   for i := 0; i < n; i++ {
     for k := 0; k < len(table[i]); k++ {
@@ -59,5 +56,4 @@ func RemapBits(input []byte, table [][]int) []byte {
       }
     }
   }
-  return output
 }

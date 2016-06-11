@@ -19,24 +19,51 @@ package lib
 /* -------------------------------------------------------------------------- */
 
 //import "fmt"
-import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestBitPermuation(t *testing.T) {
+type DESCipher struct {
+  FeistelNetwork
+}
 
-  table := []int{
-    0, 1, 9, 3, 4, 5, 6, 7,
-    8, 2,10,11,12,13,14,15}
-  input  := []byte{4,0}
-  output := []byte{0,0}
+/* -------------------------------------------------------------------------- */
 
-  PermuteBits(input, output, table)
+func fExpansion(input, output []byte) {
+  table := [][]int{
+    { 1, 47},
+    { 2},
+    { 3},
+    { 4,  6},
+    { 7,  5},
+    { 8},
+    { 9},
+    {10,  12},
+    {13,  11},
+    {14},
+    {15},
+    {16,  18},
+    {19,  17},
+    {20},
+    {21},
+    {22,  24},
+    {25,  23},
+    {26},
+    {27},
+    {28,  30},
+    {31,  29},
+    {32},
+    {33},
+    {34,  36},
+    {37,  35},
+    {38},
+    {39},
+    {40,  42},
+    {43,  41},
+    {44},
+    {45},
+    {46,   0} }
+  RemapBits(input, output, table)
+}
 
-  if output[0] != 0 {
-    t.Error("bitmap test failed")
-  }
-  if output[1] != 2 {
-    t.Error("bitmap test failed")
-  }
+func NewDESCipher() {
 }
