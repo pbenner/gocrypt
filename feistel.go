@@ -51,19 +51,19 @@ func NewFeistelNetwork(round, blockLength int, k Kfunc, f Ffunc) FeistelNetwork 
 }
 
 func (network FeistelNetwork) encryptBlock(input, output, fTmp []byte) {
-  n := len(input)
+  l := network.BlockLength
   // variables at the end of a round
-  Li := output[0:n/2]
-  Ri := output[n/2:n]
+  Li := output[0:l/2]
+  Ri := output[l/2:l]
   // let j = i+1
-  Lj := input[0:n/2]
-  Rj := input[n/2:n]
+  Lj := input[0:l/2]
+  Rj := input[l/2:l]
   // apply encryption multiple times
   for i := 0; i < network.Rounds; i++ {
     // switch input and output
     Li, Ri, Lj, Rj = Lj, Rj, Li, Ri
     // copy Ri to Lj
-    for k := 0; k < len(Ri); k++ {
+    for k := 0; k < l/2; k++ {
       Lj[k] = Ri[k]
     }
     // get the ith key
