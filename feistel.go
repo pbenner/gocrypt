@@ -22,20 +22,31 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-type FeistelNetwork struct {
-  Rounds      int
-  BlockLength int // block length in bytes
-  Key         func(i int) []byte
-  F           func(key, input, output []byte)
-}
-
-/* -------------------------------------------------------------------------- */
-
 // compute element-wise xor: z = x (+) y
 func xorSlice(x, y, z []byte) {
   for i := 0; i < len(x); i++ {
     z[i] = x[i] ^ y[i]
   }
+}
+
+/* -------------------------------------------------------------------------- */
+
+// key function returning the ith subkey
+type Kfunc func(i int) []byte
+// encryption function
+type Ffunc func(key, input, output []byte)
+
+type FeistelNetwork struct {
+  Rounds      int
+  BlockLength int // block length in bytes
+  K           Kfunc
+  F           Ffunc
+}
+
+/* -------------------------------------------------------------------------- */
+
+func NewFeistelNetwork(round, blockLength int, k Kfunc, f Ffunc) FeistelNetwork {
+  return FeistelNetwork{round, blockLength, k, f}
 }
 
 func (network FeistelNetwork) EncryptBlock(input, output []byte) {
@@ -52,7 +63,7 @@ func (network FeistelNetwork) EncryptBlock(input, output []byte) {
     // switch input and output
     input, output = output, input
     // get the ith key
-    key := network.Key(i)
+    key := network.K(i)
     // call F function
     network.F(key, Ri, Fout)
     // encrypte Li and store result in Rj
