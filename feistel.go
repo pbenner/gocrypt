@@ -33,7 +33,7 @@ func xorSlice(x, y, z []byte) {
 
 // key function returning the ith subkey
 type Kfunc func(i int) []byte
-// encryption function
+// feistel function
 type Ffunc func(key, input, output []byte)
 
 type FeistelNetwork struct {
@@ -46,7 +46,6 @@ type FeistelNetwork struct {
 /* -------------------------------------------------------------------------- */
 
 func NewFeistelNetwork(round, blockLength int, k Kfunc, f Ffunc) FeistelNetwork {
-  // result of the F function
   return FeistelNetwork{round, blockLength, k, f}
 }
 
