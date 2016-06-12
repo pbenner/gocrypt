@@ -66,7 +66,7 @@ var desFsbox1 = []byte{
   14,  4, 13,  1,  2, 15, 11,  8,  3, 10,  6, 12,  5,  9,  0,  7,
    0, 15,  7,  4, 14,  2, 13,  1, 10,  6, 12, 11,  9,  5,  3,  8,
    4,  1, 14,  8, 13,  6,  2, 11, 15, 12,  9,  7,  3, 10,  5,  0,
-  15, 12,  8,  2,  4,  9,  1,  7,  5, 11,  3, 14, 10,  0,  6, 13}
+  15, 12,  8,  2,  4,  9,  1,  7,  5, 11,  3, 14, 10,  0,  6, 13 }
 
 var desFsbox2 = []byte{
   15,  1,  8, 14,  6, 11,  3,  4,  9,  7,  2, 13, 12,  0,  5, 10,
@@ -157,9 +157,13 @@ func desFeistelFunctionSbox(input, output []byte) {
 func desFeistelFunction(input, output, key []byte) {
   tmp1 := make([]byte, 48/8)
   tmp2 := make([]byte, 32/8)
+  // expand input
   BitmapInjective(input, tmp1, desFexpansion)
+  // xor result with key
   xorSlice(tmp1, key, tmp1)
+  // send result through s-boxes
   desFeistelFunctionSbox(tmp1, tmp2)
+  // permute output of s-boxes
   BitmapInjective(tmp2, output, desFsboxP)
 }
 
