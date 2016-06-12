@@ -24,7 +24,7 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestBitPermuation(t *testing.T) {
+func TestBitmapSurjective(t *testing.T) {
 
   table := []int{
     0, 1, 9, 3, 4, 5, 6, 7,
@@ -32,7 +32,7 @@ func TestBitPermuation(t *testing.T) {
   input  := []byte{4,0}
   output := []byte{0,0}
 
-  PermuteBits(input, output, table)
+  BitmapSurjective(input, output, table)
 
   if output[0] != 0 {
     t.Error("bitmap test failed")
@@ -42,12 +42,46 @@ func TestBitPermuation(t *testing.T) {
   }
 }
 
-func TestBitMap(t *testing.T) {
+func TestBitmap(t *testing.T) {
+
+  table := [][]int{
+    { 1, 47},
+    { 2},
+    { 3},
+    { 4,  6},
+    { 7,  5},
+    { 8},
+    { 9},
+    {10, 12},
+    {13, 11},
+    {14},
+    {15},
+    {16, 18},
+    {19, 17},
+    {20},
+    {21},
+    {22, 24},
+    {25, 23},
+    {26},
+    {27},
+    {28, 30},
+    {31, 29},
+    {32},
+    {33},
+    {34, 36},
+    {37, 35},
+    {38},
+    {39},
+    {40, 42},
+    {43, 41},
+    {44},
+    {45},
+    {46,  0} }
 
   input  := []byte{0,0,1,1<<7}
   output := []byte{0,0,0,0,0,0}
 
-  fExpansion(input, output)
+  Bitmap(input, output, table)
 
   if output[0] != 1 {
     t.Error("bitmap test failed")
@@ -78,4 +112,56 @@ func TestBitMap(t *testing.T) {
   // fmt.Println("output[3]:", strconv.FormatInt(int64(output[3]), 2))
   // fmt.Println("output[4]:", strconv.FormatInt(int64(output[4]), 2))
   // fmt.Println("output[5]:", strconv.FormatInt(int64(output[5]), 2))
+}
+
+func TestBitmapInjective(t *testing.T) {
+  table1 := [][]int{
+    { 1, 47},
+    { 2},
+    { 3},
+    { 4,  6},
+    { 7,  5},
+    { 8},
+    { 9},
+    {10, 12},
+    {13, 11},
+    {14},
+    {15},
+    {16, 18},
+    {19, 17},
+    {20},
+    {21},
+    {22, 24},
+    {25, 23},
+    {26},
+    {27},
+    {28, 30},
+    {31, 29},
+    {32},
+    {33},
+    {34, 36},
+    {37, 35},
+    {38},
+    {39},
+    {40, 42},
+    {43, 41},
+    {44},
+    {45},
+    {46,  0} }
+  table2 := make([]int, 48)
+  reduceTableInjective(table1, table2)
+
+  input   := []byte{0,0,1,1<<7}
+  output1 := []byte{0,0,0,0,0,0}
+  output2 := []byte{0,0,0,0,0,0}
+
+  Bitmap         (input, output1, table1)
+  BitmapInjective(input, output2, table2)
+
+  for i := 0; i < len(output1); i++ {
+    if output1[i] != output2[i] {
+      t.Error("bitmap test failed")
+    }
+  }
+
 }

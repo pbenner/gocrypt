@@ -19,10 +19,35 @@ package lib
 /* -------------------------------------------------------------------------- */
 
 //import "fmt"
+import "errors"
 
 /* -------------------------------------------------------------------------- */
 
-func PermuteBits(input, output []byte, table []int) {
+func reduceTableInjective(table [][]int, result []int) error {
+  for i := 0; i < len(result); i++ {
+    result[i] = -1
+  }
+  for i := 0; i < len(table); i++ {
+    // i: input bit
+    // j: output bit
+    for k := 0; k < len(table[i]); k++ {
+      j := table[i][k]
+      if result[j] == -1 {
+        result[j] = i
+      } else {
+        return errors.New("table cannot be converted")
+      }
+    }
+  }
+  return nil
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Surjective mapping of input bits to output bits. The mapping
+// is defined by the table. The ith bit in the input slice is
+// mapped to position j = table[i] in the output.
+func BitmapSurjective(input, output []byte, table []int) {
   // number of input bits
   n := 8*len(input)
   // check if table is long enough
@@ -39,7 +64,27 @@ func PermuteBits(input, output []byte, table []int) {
   }
 }
 
-func RemapBits(input, output []byte, table [][]int) {
+// Injective mapping of input bits to output bits. The mapping
+// is defined by the table. The jth bit in the output slice is
+// copied from position i = table[j] in the input.
+func BitmapInjective(input, output []byte, table []int) {
+  // number of input bits
+  n := 8*len(output)
+  // check if table is long enough
+  if len(table) != n {
+    panic("table has invalid length")
+  }
+  // loop over output bits
+  for j := 0; j < n; j++ {
+    // index of the input bit
+    i := table[j]
+    if input[i/8]  & byte(1 << byte(i % 8)) != 0 {
+      output[j/8] |= byte(1 << byte(j % 8))
+    }
+  }
+}
+
+func Bitmap(input, output []byte, table [][]int) {
   // number of input bits
   n := 8*len(input)
   // check if table is long enough
