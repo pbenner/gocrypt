@@ -31,9 +31,9 @@ func reduceTableInjective(table [][]int, result []int) error {
     // i: input bit
     // j: output bit
     for k := 0; k < len(table[i]); k++ {
-      j := table[i][k]
+      j := table[i][k]-1
       if result[j] == -1 {
-        result[j] = i
+        result[j] = i+1
       } else {
         return errors.New("table cannot be converted")
       }
@@ -57,7 +57,7 @@ func BitmapSurjective(input, output []byte, table []int) {
   // loop over input bits
   for i := 0; i < n; i++ {
     // index of the output bit
-    j := table[i]
+    j := table[i]-1
     if input[i/8]  & byte(1 << byte(i % 8)) != 0 {
       output[j/8] |= byte(1 << byte(j % 8))
     }
@@ -77,7 +77,7 @@ func BitmapInjective(input, output []byte, table []int) {
   // loop over output bits
   for j := 0; j < n; j++ {
     // index of the input bit
-    i := table[j]
+    i := table[j]-1
     if input[i/8]  & byte(1 << byte(i % 8)) != 0 {
       output[j/8] |= byte(1 << byte(j % 8))
     }
@@ -95,7 +95,7 @@ func Bitmap(input, output []byte, table [][]int) {
   for i := 0; i < n; i++ {
     for k := 0; k < len(table[i]); k++ {
       // index of the output bit
-      j := table[i][k]
+      j := table[i][k]-1
       if input[i/8]  & byte(1 << byte(i % 8)) != 0 {
         output[j/8] |= byte(1 << byte(j % 8))
       }
