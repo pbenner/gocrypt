@@ -28,6 +28,20 @@ type DESCipher struct {
 
 /* -------------------------------------------------------------------------- */
 
+func init() {
+  // convert s-boxes to simplify indexing
+  desFsbox1 = convertSbox6to4(desFsbox1)
+  desFsbox2 = convertSbox6to4(desFsbox2)
+  desFsbox3 = convertSbox6to4(desFsbox3)
+  desFsbox4 = convertSbox6to4(desFsbox4)
+  desFsbox5 = convertSbox6to4(desFsbox5)
+  desFsbox6 = convertSbox6to4(desFsbox6)
+  desFsbox7 = convertSbox6to4(desFsbox7)
+  desFsbox8 = convertSbox6to4(desFsbox8)
+}
+
+/* -------------------------------------------------------------------------- */
+
 /* initial permutation IP */
 var desIP = []int{
   58, 50, 42, 34, 26, 18, 10,  2, 60, 52, 44, 36, 28, 20, 12,  4,
@@ -48,7 +62,7 @@ var desFexpansion = []int{
   12, 13,  12, 13, 14, 15, 16, 17, 16, 17, 18, 19, 20, 21, 20, 21,
   22, 23, 24, 25, 24, 25, 26, 27, 28, 29,  28, 29, 30, 31, 32,  1 }
 
-var desSbox1 = []byte{
+var desFsbox1 = []byte{
   14,  4, 13,  1,  2, 15, 11,  8,  3, 10,  6, 12,  5,  9,  0,  7,
    0, 15,  7,  4, 14,  2, 13,  1, 10,  6, 12, 11,  9,  5,  3,  8,
    4,  1, 14,  8, 13,  6,  2, 11, 15, 12,  9,  7,  3, 10,  5,  0,
@@ -95,6 +109,59 @@ var desFsbox8 = []byte{
    1, 15, 13,  8, 10,  3,  7,  4, 12,  5,  6, 11,  0, 14,  9,  2,
    7, 11,  4,  1,  9, 12, 14,  2,  0,  6, 10, 13, 15,  3,  5,  8,
    2,  1, 14,  7,  4, 10,  8, 13, 15, 12,  9,  0,  3,  5,  6, 11 }
+
+var desFsboxP = []int{
+  16,  7, 20, 21, 29, 12, 28, 17,  1, 15, 23, 26,  5, 18, 31, 10,
+   2,  8, 24, 14, 32, 27,  3,  9, 19, 13, 30,  6, 22, 11,  4, 25 }
+
+/* -------------------------------------------------------------------------- */
+
+// Shuffle Sbox entries such that the indexing with outer
+// bits for rows and middle bits for columns is converted to a
+// standard lookup table.
+func convertSbox6to4(input []byte) []byte {
+  output := make([]byte, len(input))
+
+  for i := 0; i < 64; i++ {
+    row := (i & 1) | ((i>>4) & 2)
+    col := (i >> 1) & 0xF
+    k := row*16 + col
+    output[i] = input[k]
+  }
+  return output
+}
+
+func desFeistelFunctionSbox(input, output []byte) {
+  i1 := input[0] & 0x3F
+  i2 := (input[0] >> 6) | ((input[1] & 0xF) << 2)
+  i3 := (input[1] >> 4) | ((input[2] & 0x3) << 0)
+  i4 := (input[2] >> 2)
+  i5 := input[3] & 0x3F
+  i6 := (input[3] >> 6) | ((input[4] & 0xF) << 2)
+  i7 := (input[4] >> 4) | ((input[5] & 0x3) << 0)
+  i8 := (input[5] >> 2)
+  o1 := desFsbox1[i1]
+  o2 := desFsbox2[i2]
+  o3 := desFsbox3[i3]
+  o4 := desFsbox4[i4]
+  o5 := desFsbox5[i5]
+  o6 := desFsbox6[i6]
+  o7 := desFsbox7[i7]
+  o8 := desFsbox8[i8]
+  output[0] = o1 + (o2 << 4)
+  output[1] = o3 + (o4 << 4)
+  output[2] = o5 + (o6 << 4)
+  output[3] = o7 + (o8 << 4)
+}
+
+func desFeistelFunction(input, output, key []byte) {
+  tmp1 := make([]byte, 48/8)
+  tmp2 := make([]byte, 32/8)
+  BitmapInjective(input, tmp1, desFexpansion)
+  xorSlice(tmp1, key, tmp1)
+  desFeistelFunctionSbox(tmp1, tmp2)
+  BitmapInjective(tmp2, output, desFsboxP)
+}
 
 /* -------------------------------------------------------------------------- */
 
