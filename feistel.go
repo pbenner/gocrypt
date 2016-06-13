@@ -59,7 +59,7 @@ func (network FeistelNetwork) encryptBlock(input, output, fTmp []byte) {
   Rj := input[l/2:l]
   // apply encryption multiple times
   for i := 0; i < network.Rounds; i++ {
-    // switch input and output
+    // swap i and j
     Li, Ri, Lj, Rj = Lj, Rj, Li, Ri
     // copy Ri to Lj
     for k := 0; k < l/2; k++ {
