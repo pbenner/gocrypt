@@ -19,6 +19,7 @@ package lib
 /* -------------------------------------------------------------------------- */
 
 //import "fmt"
+//import "strconv"
 
 /* -------------------------------------------------------------------------- */
 
@@ -134,11 +135,11 @@ func convertSbox6to4(input []byte) []byte {
 func desFeistelFunctionSbox(input, output []byte) {
   i1 := input[0] & 0x3F
   i2 := (input[0] >> 6) | ((input[1] & 0xF) << 2)
-  i3 := (input[1] >> 4) | ((input[2] & 0x3) << 0)
+  i3 := (input[1] >> 4) | ((input[2] & 0x3) << 4)
   i4 := (input[2] >> 2)
   i5 := input[3] & 0x3F
   i6 := (input[3] >> 6) | ((input[4] & 0xF) << 2)
-  i7 := (input[4] >> 4) | ((input[5] & 0x3) << 0)
+  i7 := (input[4] >> 4) | ((input[5] & 0x3) << 4)
   i8 := (input[5] >> 2)
   o1 := desFsbox1[i1]
   o2 := desFsbox2[i2]
