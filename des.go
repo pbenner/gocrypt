@@ -172,3 +172,14 @@ func desFeistelFunction(input, output, key []byte) {
 
 func NewDESCipher() {
 }
+
+func (cipher DESCipher) Encrypt(input []byte) []byte {
+  tmp1 := make([]byte, len(input))
+  // apply initial permutation
+  BitmapInjective(input, tmp1, desIP)
+  tmp2 := cipher.FeistelNetwork.Encrypt(tmp1)
+  // apply final permutation
+  BitmapInjective(tmp2, tmp1, desFP)
+
+  return tmp1
+}
