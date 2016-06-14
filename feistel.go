@@ -22,15 +22,6 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-// compute element-wise xor: z = x (+) y
-func xorSlice(x, y, z []byte) {
-  for i := 0; i < len(x); i++ {
-    z[i] = x[i] ^ y[i]
-  }
-}
-
-/* -------------------------------------------------------------------------- */
-
 // key function returning the ith subkey
 type Kfunc func(i int) []byte
 // feistel function
