@@ -146,7 +146,7 @@ func convertSbox6to4(input []byte) []byte {
 
 /* -------------------------------------------------------------------------- */
 
-func desFeistelFunctionSbox(input, output []byte) {
+func desSbox(input, output []byte) {
   i1 := input[0] & 0x3F
   i2 := (input[0] >> 6) | ((input[1] & 0xF) << 2)
   i3 := (input[1] >> 4) | ((input[2] & 0x3) << 4)
@@ -169,7 +169,7 @@ func desFeistelFunctionSbox(input, output []byte) {
   output[3] = o7 + (o8 << 4)
 }
 
-func desFeistelFunction(input, output, key []byte) {
+func desRoundFunction(input, output, key []byte) {
   tmp1 := make([]byte, 48/8)
   tmp2 := make([]byte, 32/8)
   // expand input
@@ -177,9 +177,38 @@ func desFeistelFunction(input, output, key []byte) {
   // xor result with key
   xorSlice(tmp1, key, tmp1)
   // send result through s-boxes
-  desFeistelFunctionSbox(tmp1, tmp2)
+  desSbox(tmp1, tmp2)
   // permute output of s-boxes
   BitmapInjective(tmp2, output, desFsboxP)
+}
+
+func desSplitRotateKey(key []byte) {
+  var tmp1, tmp2 byte
+  tmp1 = key[6] >> 7
+  for i := 0; i < 7; i++ {
+    tmp2 = key[i] >> 7
+    key[i] <<= 1
+    key[i]  |= tmp1
+    // swap tmp1 and tmp2
+    tmp1, tmp2 = tmp2, tmp1
+  }
+  // get old bit 48 now at bit 1
+  tmp1 = key[0] & 0x1
+  // get old bit 28 nor at bit 29
+  tmp2 = (key[3] & 0x10) >> 4
+  if tmp2 == 1 {
+    // set old bit 48
+    key[0] |=  1
+  } else {
+    // clr old bit 48
+    key[0] &= 0xFE
+  }
+  if tmp1 == 1 {
+    // set old bit 28
+    key[3] |=  (1 << 4)
+  } else {
+    key[3] &= 0xEE
+  }
 }
 
 /* -------------------------------------------------------------------------- */

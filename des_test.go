@@ -18,13 +18,13 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
-//import "strconv"
+import "fmt"
+import "strconv"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestSBox(t *testing.T) {
+func TestDESsBox(t *testing.T) {
   //  input  100111 010100 100110 100001 111010 011110 010001 011000
   //  input  10011101 01001001 10100001 11101001 11100100 01011000
   // output: 0111 1001 0101 1011 0010 1000 1100 0101
@@ -38,7 +38,7 @@ func TestSBox(t *testing.T) {
 
   output := make([]byte, 32/8)
 
-  desFeistelFunctionSbox(input, output)
+  desSbox(input, output)
 
   if output[0] != 0x5 | (0xC << 4) {
     t.Error("DES s-box test failed")
