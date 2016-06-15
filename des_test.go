@@ -54,3 +54,33 @@ func TestDESsBox(t *testing.T) {
   }
 
 }
+
+func TestDESkeyShift(t *testing.T) {
+  // 00111011 00111000 10011000 00110111 00010101 00100000 11110111 01011110
+  key1 := []byte{0x5e,0xf7,0x20,0x15,0x37,0x98,0x38,0x3b}
+  key2 := make([]byte, 8)
+  // 0100010 0110000 0001101 0111101 1100100 1110110 0010000 1111111
+  tmp := make([]byte, 56/8)
+
+
+  ReverseBits(key1, key2)
+  BitmapInjective(key2, tmp, desKeyPC1)
+
+  fmt.Println("key:", strconv.FormatInt(int64(key1[0]), 2))
+  fmt.Println("key:", strconv.FormatInt(int64(key1[1]), 2))
+  fmt.Println("key:", strconv.FormatInt(int64(key1[2]), 2))
+  fmt.Println("key:", strconv.FormatInt(int64(key1[3]), 2))
+  fmt.Println("key:", strconv.FormatInt(int64(key1[4]), 2))
+  fmt.Println("key:", strconv.FormatInt(int64(key1[5]), 2))
+  fmt.Println("key:", strconv.FormatInt(int64(key1[6]), 2))
+  fmt.Println("key:", strconv.FormatInt(int64(key1[7]), 2))
+  fmt.Println()
+  fmt.Println("tmp:", strconv.FormatInt(int64(tmp[0]), 2))
+  fmt.Println("tmp:", strconv.FormatInt(int64(tmp[1]), 2))
+  fmt.Println("tmp:", strconv.FormatInt(int64(tmp[2]), 2))
+  fmt.Println("tmp:", strconv.FormatInt(int64(tmp[3]), 2))
+  fmt.Println("tmp:", strconv.FormatInt(int64(tmp[4]), 2))
+  fmt.Println("tmp:", strconv.FormatInt(int64(tmp[5]), 2))
+  fmt.Println("tmp:", strconv.FormatInt(int64(tmp[6]), 2))
+
+}
