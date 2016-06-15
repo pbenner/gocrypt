@@ -61,13 +61,18 @@ func TestDESkeyShift(t *testing.T) {
   key2 := make([]byte, 8)
   // 01000100 11000000 01101011 11011100 10011101 10001000 01111111
   tmp1 := make([]byte, 56/8)
+  tmp2 := make([]byte, 48/8)
 
 
   ReverseBits(key1, key2)
   BitmapInjective(key2, tmp1, desKeyPC1)
 
   fmt.Println(Key(key2).BinarySequence())
-  fmt.Println(Key(tmp1).BinarySequence())
-  desSplitRotateKey(tmp1)
-  fmt.Println(Key(tmp1).BinarySequence())
+  fmt.Println("CD[00]:",Key(tmp1).BinarySequence())
+  for i := 0; i < 15; i++ {
+    desSplitRotateKey(tmp1, desKeyRotation[i])
+    fmt.Printf("CD[%02d]: %s\n", i+1, Key(tmp1).BinarySequence())
+    BitmapInjective(tmp1, tmp2, desKeyPC2)
+    fmt.Printf("KS[%02d]: %s\n", i+1, Key(tmp2).BinarySequence())
+  }
 }

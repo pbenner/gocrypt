@@ -127,6 +127,9 @@ var desKeyPC2 = []int{
   26,  8, 16,  7, 27, 20, 13,  2, 41, 52, 31, 37, 47, 55, 30, 40,
   51, 45, 33, 48, 44, 49, 39, 56, 34, 53, 46, 42, 50, 36, 29, 32 }
 
+var desKeyRotation = []int{
+  1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 }
+
 /* -------------------------------------------------------------------------- */
 
 // Shuffle Sbox entries such that the indexing with outer
@@ -182,7 +185,7 @@ func desRoundFunction(input, output, key []byte) {
   BitmapInjective(tmp2, output, desFsboxP)
 }
 
-func desSplitRotateKey(key []byte) {
+func desSplitRotateKeyOnce(key []byte) {
   var tmp1, tmp2 byte
   tmp1 = key[0] & 0x1
   for i := 6; i >= 0; i-- {
@@ -208,6 +211,12 @@ func desSplitRotateKey(key []byte) {
     key[3] |= (1 << 3)
   } else {
     key[3] &= 0xF7
+  }
+}
+
+func desSplitRotateKey(key []byte, n int) {
+  for i := 0; i < n; i++ {
+    desSplitRotateKeyOnce(key)
   }
 }
 
