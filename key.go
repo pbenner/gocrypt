@@ -18,7 +18,9 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
+import "fmt"
+import "bufio"
+import "bytes"
 import "math"
 import "encoding/binary"
 import "encoding/base64"
@@ -56,12 +58,34 @@ func (k Key) Uint64Slice() []uint64 {
     }
     result[i/step] = binary.LittleEndian.Uint64(tmp)
   }
-  return (result)
+  return result
 }
 
 func (k Key) String() string {
 
   s := base64.StdEncoding.EncodeToString(k)
 
-  return (s)
+  return s
+}
+
+func (k Key) BinarySequence() string {
+
+  buffer := new(bytes.Buffer)
+  writer := bufio.NewWriter(buffer)
+
+  for i := 0; i < len(k); i++ {
+    if i != 0 {
+      fmt.Fprintf(writer, " ")
+    }
+    for j := 0; j < 8; j++ {
+      if k[i] & (1 << uint(j)) != 0 {
+        fmt.Fprintf(writer, "1")
+      } else {
+        fmt.Fprintf(writer, "0")
+      }
+    }
+  }
+  writer.Flush()
+
+  return buffer.String()
 }

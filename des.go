@@ -184,30 +184,30 @@ func desRoundFunction(input, output, key []byte) {
 
 func desSplitRotateKey(key []byte) {
   var tmp1, tmp2 byte
-  tmp1 = key[6] >> 7
-  for i := 0; i < 7; i++ {
-    tmp2 = key[i] >> 7
-    key[i] <<= 1
-    key[i]  |= tmp1
+  tmp1 = key[0] & 0x1
+  for i := 6; i >= 0; i-- {
+    tmp2 = key[i] & 0x1
+    key[i] >>= 1
+    key[i]  |= (tmp1 << 7)
     // swap tmp1 and tmp2
     tmp1, tmp2 = tmp2, tmp1
   }
-  // get old bit 48 now at bit 1
-  tmp1 = key[0] & 0x1
-  // get old bit 28 nor at bit 29
+  // get old bit 1 now at bit 48
+  tmp1 = (key[6] & 0x80) >> 7
+  // get old bit 29 nor at bit 28
   tmp2 = (key[3] & 0x10) >> 4
   if tmp2 == 1 {
     // set old bit 48
-    key[0] |=  1
+    key[6] |= (1 << 7)
   } else {
     // clr old bit 48
-    key[0] &= 0xFE
+    key[6] &= 0x7F
   }
   if tmp1 == 1 {
     // set old bit 28
-    key[3] |=  (1 << 4)
+    key[3] |= (1 << 3)
   } else {
-    key[3] &= 0xEE
+    key[3] &= 0xF7
   }
 }
 
