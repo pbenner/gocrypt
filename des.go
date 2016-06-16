@@ -210,6 +210,7 @@ func desSplitRotateKeyOnce(key []byte) {
     // set old bit 28
     key[3] |= (1 << 3)
   } else {
+    // clr old bit 28
     key[3] &= 0xF7
   }
 }
