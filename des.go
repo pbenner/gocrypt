@@ -198,7 +198,7 @@ func desSplitRotateKeyOnce(key []byte) {
   // get old bit 1 now at bit 48
   tmp1 = (key[6] & 0x80) >> 7
   // get old bit 29 nor at bit 28
-  tmp2 = (key[3] & 0x10) >> 4
+  tmp2 = (key[3] & 0x08) >> 3
   if tmp2 == 1 {
     // set old bit 48
     key[6] |= (1 << 7)
