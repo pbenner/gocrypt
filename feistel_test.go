@@ -29,15 +29,13 @@ func TestFeistel(t *testing.T) {
   // of two bytes. Let input = [L0, R0], then the output =
   // [L1,R1] is given by L1 = R0 and R1 = L0 (+) R0.
 
-  k := func(i int) []byte {
-    return []byte{}
-  }
+  k := make([][]byte, 1)
   f := func(key, input, output []byte) {
     for i := 0; i < len(input); i++ {
       output[i] = input[i]
     }
   }
-  network := NewFeistelNetwork(1, 2, k, f)
+  network := NewFeistelNetwork(2, k, f)
 
   input  := []byte{13,3}
   output := network.Encrypt(input)

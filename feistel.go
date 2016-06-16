@@ -22,22 +22,19 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-// key function returning the ith subkey
-type Kfunc func(i int) []byte
-// feistel function
-type Ffunc func(key, input, output []byte)
+// round function
+type RoundFunction func(key, input, output []byte)
 
 type FeistelNetwork struct {
-  Rounds      int
   BlockLength int // block length in bytes
-  K           Kfunc
-  F           Ffunc
+  Keys        [][]byte
+  F           RoundFunction
 }
 
 /* -------------------------------------------------------------------------- */
 
-func NewFeistelNetwork(round, blockLength int, k Kfunc, f Ffunc) FeistelNetwork {
-  return FeistelNetwork{round, blockLength, k, f}
+func NewFeistelNetwork(blockLength int, keys [][]byte, f RoundFunction) FeistelNetwork {
+  return FeistelNetwork{blockLength, keys, f}
 }
 
 func (network FeistelNetwork) encryptBlock(input, output, fTmp []byte) {
@@ -49,17 +46,15 @@ func (network FeistelNetwork) encryptBlock(input, output, fTmp []byte) {
   Lj := input[0:l/2]
   Rj := input[l/2:l]
   // apply encryption multiple times
-  for i := 0; i < network.Rounds; i++ {
+  for i := 0; i < len(network.Keys); i++ {
     // swap i and j
     Li, Ri, Lj, Rj = Lj, Rj, Li, Ri
     // copy Ri to Lj
     for k := 0; k < l/2; k++ {
       Lj[k] = Ri[k]
     }
-    // get the ith key
-    key := network.K(i)
     // call F function
-    network.F(key, Ri, fTmp)
+    network.F(network.Keys[i], Ri, fTmp)
     // encrypte Li and store result in Rj
     xorSlice(Li, fTmp, Rj)
   }

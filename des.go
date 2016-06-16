@@ -24,7 +24,6 @@ package lib
 /* -------------------------------------------------------------------------- */
 
 type DESCipher struct {
-  Keys [16][]byte
   FeistelNetwork
 }
 
@@ -172,7 +171,7 @@ func desSbox(input, output []byte) {
   output[3] = o7 + (o8 << 4)
 }
 
-func desRoundFunction(input, output, key []byte) {
+func desRoundFunction(key, input, output []byte) {
   tmp1 := make([]byte, 48/8)
   tmp2 := make([]byte, 32/8)
   // expand input
@@ -223,7 +222,12 @@ func desSplitRotateKey(key []byte, n int) {
 
 /* -------------------------------------------------------------------------- */
 
-func NewDESCipher() {
+func NewDESCipher(key Key) DESCipher {
+  cipher := DESCipher{}
+  cipher.GenerateSubkeys(key)
+  cipher.BlockLength = 64
+  cipher.F           = desRoundFunction
+  return cipher
 }
 
 /* -------------------------------------------------------------------------- */
