@@ -239,6 +239,16 @@ func (cipher DESCipher) Encrypt(input []byte) []byte {
 }
 
 func (cipher *DESCipher) GenerateSubkeys(key []byte) {
-  tmp1 := make([]byte, 56/8)
-  BitmapInjective(key, tmp1, desKeyPC1)
+  tmp := make([]byte, 56/8)
+
+  // apply permutation choice 1
+  BitmapInjective(key, tmp, desKeyPC1)
+  for i := 0; i < 15; i++ {
+    // allocate memory
+    cipher.Keys[i] = make([]byte, 48/8)
+    // rotate bits
+    desSplitRotateKey(tmp, desKeyRotation[i])
+    // apply permutation choice 2
+    BitmapInjective(tmp, cipher.Keys[i], desKeyPC2)
+  }
 }
