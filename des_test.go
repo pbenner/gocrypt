@@ -71,14 +71,23 @@ func TestDESkeys(t *testing.T) {
 
 func TestDESencrypt(t *testing.T) {
   key := Key(Bits{}.Read("00111011 00111000 10011000 00110111 00010101 00100000 11110111 01011110"))
+  // simply use the key as message
+  msg := key
   des := NewDESCipher(Key(key))
-  msg := des.Encrypt(key)
+
+  encrypted := des.Encrypt(msg)
+  decrypted := des.Decrypt(encrypted)
 
   result := Bits{}.Read("10001111 00000011 01000101 01101101 00111111 01111000 11100010 11000101")
 
   for i := 0; i < len(result); i++ {
-    if result[i] != msg[i] {
+    if result[i] != encrypted[i] {
       t.Error("DES encryption failed")
+    }
+  }
+  for i := 0; i < len(result); i++ {
+    if msg[i] != decrypted[i] {
+      t.Error("DES decryption failed")
     }
   }
 }

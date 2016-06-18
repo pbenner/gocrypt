@@ -224,6 +224,23 @@ func (cipher DESCipher) Encrypt(input []byte) []byte {
   return tmp1
 }
 
+func (cipher DESCipher) Decrypt(input []byte) []byte {
+  tmp1 := make([]byte, len(input))
+  bl   := cipher.BlockLength
+  // apply initial permutation
+  for i := 0; i < len(input); i += cipher.BlockLength {
+    Bits(tmp1[i:i+bl]).MapInjective(input[i:i+bl], desIP)
+  }
+  // encrypt message
+  tmp2 := cipher.FeistelNetwork.Decrypt(tmp1)
+  Bits(tmp1).Clear()
+  // apply final permutation
+  for i := 0; i < len(input); i += cipher.BlockLength {
+    Bits(tmp1[i:i+bl]).MapInjective(tmp2[i:i+bl], desFP)
+  }
+  return tmp1
+}
+
 func (cipher *DESCipher) GenerateSubkeys(key []byte) {
   tmp := make([]byte, 56/8)
   cipher.Keys = make([][]byte, 16)
