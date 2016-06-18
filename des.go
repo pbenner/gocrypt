@@ -189,15 +189,7 @@ func (des DESCipher) RoundFunction(key, input, output []byte) {
 }
 
 func (DESCipher) RotateKeyOnce(key []byte) {
-  var tmp1, tmp2 byte
-  tmp1 = key[0] & 0x1
-  for i := 6; i >= 0; i-- {
-    tmp2 = key[i] & 0x1
-    key[i] >>= 1
-    key[i]  |= (tmp1 << 7)
-    // swap tmp1 and tmp2
-    tmp1, tmp2 = tmp2, tmp1
-  }
+  Bits(key).Rotate(key, -1)
   Bits(key).Swap(27, 55)
 }
 
