@@ -18,7 +18,7 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
+import "fmt"
 //import "strconv"
 
 /* -------------------------------------------------------------------------- */
@@ -30,15 +30,35 @@ type DESCipher struct {
 /* -------------------------------------------------------------------------- */
 
 func init() {
+  // Shuffle Sbox entries such that the indexing with outer
+  // bits for rows and middle bits for columns is converted to a
+  // standard lookup table.
+  convertSbox := func(input []byte) []byte {
+    output := make([]byte, len(input))
+
+    for i := 0; i < 64; i++ {
+      b1 := (i & (1 << 0) >> 0)
+      b2 := (i & (1 << 1) >> 1)
+      b3 := (i & (1 << 2) >> 2)
+      b4 := (i & (1 << 3) >> 3)
+      b5 := (i & (1 << 4) >> 4)
+      b6 := (i & (1 << 5) >> 5)
+      row := (b1 << 1) + (b6 << 0)
+      col := (b2 << 3) + (b3 << 2) + (b4 << 1) + (b5 << 0)
+      k := row*16 + col
+      output[i] = reverseByte(input[k]) >> 4
+    }
+    return output
+  }
   // convert s-boxes to simplify indexing
-  desFsbox1 = convertSbox6to4(desFsbox1)
-  desFsbox2 = convertSbox6to4(desFsbox2)
-  desFsbox3 = convertSbox6to4(desFsbox3)
-  desFsbox4 = convertSbox6to4(desFsbox4)
-  desFsbox5 = convertSbox6to4(desFsbox5)
-  desFsbox6 = convertSbox6to4(desFsbox6)
-  desFsbox7 = convertSbox6to4(desFsbox7)
-  desFsbox8 = convertSbox6to4(desFsbox8)
+  desFsbox1 = convertSbox(desFsbox1)
+  desFsbox2 = convertSbox(desFsbox2)
+  desFsbox3 = convertSbox(desFsbox3)
+  desFsbox4 = convertSbox(desFsbox4)
+  desFsbox5 = convertSbox(desFsbox5)
+  desFsbox6 = convertSbox(desFsbox6)
+  desFsbox7 = convertSbox(desFsbox7)
+  desFsbox8 = convertSbox(desFsbox8)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -131,23 +151,6 @@ var desKeyRotation = []int{
 
 /* -------------------------------------------------------------------------- */
 
-// Shuffle Sbox entries such that the indexing with outer
-// bits for rows and middle bits for columns is converted to a
-// standard lookup table.
-func convertSbox6to4(input []byte) []byte {
-  output := make([]byte, len(input))
-
-  for i := 0; i < 64; i++ {
-    row := (i & 1) | ((i>>4) & 2)
-    col := (i >> 1) & 0xF
-    k := row*16 + col
-    output[i] = input[k]
-  }
-  return output
-}
-
-/* -------------------------------------------------------------------------- */
-
 func desSbox(input, output []byte) {
   i1 := input[0] & 0x3F
   i2 := (input[0] >> 6) | ((input[1] & 0xF) << 2)
@@ -176,12 +179,18 @@ func desRoundFunction(key, input, output []byte) {
   tmp2 := make([]byte, 32/8)
   // expand input
   BitmapInjective(input, tmp1, desFexpansion)
+  fmt.Println("E :", Bits(tmp1))
+  fmt.Println("KS:", Bits(key))
   // xor result with key
   xorSlice(tmp1, key, tmp1)
+  fmt.Println("E xor KS:", Bits(tmp1))
   // send result through s-boxes
   desSbox(tmp1, tmp2)
+  fmt.Println("Sbox:", Bits(tmp2))
   // permute output of s-boxes
+  ClearSlice(output)
   BitmapInjective(tmp2, output, desFsboxP)
+  fmt.Println("P  :", Bits(output))
 }
 
 func desSplitRotateKeyOnce(key []byte) {
@@ -225,7 +234,7 @@ func desSplitRotateKey(key []byte, n int) {
 func NewDESCipher(key Key) DESCipher {
   cipher := DESCipher{}
   cipher.GenerateSubkeys(key)
-  cipher.BlockLength = 64
+  cipher.BlockLength = 64/8
   cipher.F           = desRoundFunction
   return cipher
 }
@@ -234,21 +243,28 @@ func NewDESCipher(key Key) DESCipher {
 
 func (cipher DESCipher) Encrypt(input []byte) []byte {
   tmp1 := make([]byte, len(input))
+  bl   := cipher.BlockLength
   // apply initial permutation
-  BitmapInjective(input, tmp1, desIP)
+  for i := 0; i < len(input); i += cipher.BlockLength {
+    BitmapInjective(input[i:i+bl], tmp1[i:i+bl], desIP)
+  }
+  // encrypt message
   tmp2 := cipher.FeistelNetwork.Encrypt(tmp1)
+  fmt.Println("LR[16]:", Bits(tmp2))
+  ClearSlice(tmp1)
   // apply final permutation
-  BitmapInjective(tmp2, tmp1, desFP)
-
+  for i := 0; i < len(input); i += cipher.BlockLength {
+    BitmapInjective(tmp2[i:i+bl], tmp1[i:i+bl], desFP)
+  }
   return tmp1
 }
 
 func (cipher *DESCipher) GenerateSubkeys(key []byte) {
   tmp := make([]byte, 56/8)
-
+  cipher.Keys = make([][]byte, 16)
   // apply permutation choice 1
   BitmapInjective(key, tmp, desKeyPC1)
-  for i := 0; i < 15; i++ {
+  for i := 0; i < 16; i++ {
     // allocate memory
     cipher.Keys[i] = make([]byte, 48/8)
     // rotate bits

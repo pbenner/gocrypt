@@ -19,60 +19,61 @@ package lib
 /* -------------------------------------------------------------------------- */
 
 import "fmt"
-//import "strconv"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
 
 func TestDESsBox(t *testing.T) {
-  //  input  100111 010100 100110 100001 111010 011110 010001 011000
-  //  input  10011101 01001001 10100001 11101001 11100100 01011000
-  // output: 0111 1001 0101 1011 0010 1000 1100 0101
-  input := []byte{
-    0x58,  // 01011000
-    0xE4,  // 11100100
-    0xE9,  // 11101001
-    0xA1,  // 10100001
-    0x49,  // 01001001
-    0x9D } // 10011101
-
-  output := make([]byte, 32/8)
+  input  := Bits{}.Read("11111100 10001011 00011011 10010101 01110001 00011101")
+  output := make([]byte, 4)
+  result := Bits{}.Read("11010110 00111010 11001110 00101001")
 
   desSbox(input, output)
 
-  if output[0] != 0x5 | (0xC << 4) {
-    t.Error("DES s-box test failed")
+  for i := 0; i < 4; i++ {
+    if output[i] != result[i] {
+      t.Errorf("DES s-box test %d failed", i)
+    }
   }
-  if output[1] != 0x8 | (0x2 << 4) {
-    t.Error("DES s-box test failed")
-  }
-  if output[2] != 0xB | (0x5 << 4) {
-    t.Error("DES s-box test failed")
-  }
-  if output[3] != 0x9 | ( 0x7 << 4) {
-    t.Error("DES s-box test failed")
-  }
-
 }
 
-func TestDESkeyShift(t *testing.T) {
-  // 00111011 00111000 10011000 00110111 00010101 00100000 11110111 01011110
-  key1 := []byte{0x5e,0xf7,0x20,0x15,0x37,0x98,0x38,0x3b}
-  key2 := make([]byte, 8)
-  // 01000100 11000000 01101011 11011100 10011101 10001000 01111111
-  tmp1 := make([]byte, 56/8)
-  tmp2 := make([]byte, 48/8)
+func TestDESkeys(t *testing.T) {
+  key := Key(Bits{}.Read("00111011 00111000 10011000 00110111 00010101 00100000 11110111 01011110"))
 
+  result := [][]byte{
+    Bits{}.Read("01011100 00001000 01001100 01010101 10001111 01001111"),
+    Bits{}.Read("01010001 00101101 11110000 01100100 10010111 11001100"),
+    Bits{}.Read("11010100 11100100 10000101 11011000 10110100 11101111"),
+    Bits{}.Read("01010011 10000111 00000110 01101110 11011110 10101001"),
+    Bits{}.Read("01101000 10010000 10100111 00011010 01111101 01111011"),
+    Bits{}.Read("10110001 10000000 01101110 10101111 11011001 00110000"),
+    Bits{}.Read("10100000 01000010 10110010 11000001 01101111 01110010"),
+    Bits{}.Read("10110100 00011011 00110100 11111101 10001010 00011100"),
+    Bits{}.Read("00100010 11011101 01000010 10010011 10000110 01111100"),
+    Bits{}.Read("01101000 01100001 01010111 11011001 10111111 10000100"),
+    Bits{}.Read("00100101 11000101 00011001 00111000 01100110 10111101"),
+    Bits{}.Read("01000111 00000001 10110011 01111011 01111000 10000111"),
+    Bits{}.Read("10111111 10001000 10010001 10100110 01100001 10111011"),
+    Bits{}.Read("00011111 00100010 10001010 10100111 00111011 01000111"),
+    Bits{}.Read("00111010 00010100 10011100 11110110 10000011 11110010"),
+    Bits{}.Read("00010001 01111100 10000001 11010111 11100001 01001110")}
 
-  ReverseBits(key1, key2)
-  BitmapInjective(key2, tmp1, desKeyPC1)
+  des := NewDESCipher(key)
 
-  fmt.Println(Key(key2).BinarySequence())
-  fmt.Println("CD[00]:",Key(tmp1).BinarySequence())
-  for i := 0; i < 15; i++ {
-    desSplitRotateKey(tmp1, desKeyRotation[i])
-    fmt.Printf("CD[%02d]: %s\n", i+1, Key(tmp1).BinarySequence())
-    BitmapInjective(tmp1, tmp2, desKeyPC2)
-    fmt.Printf("KS[%02d]: %s\n", i+1, Key(tmp2).BinarySequence())
-  }
+  for i := 0; i < len(result); i++ {
+    for j := 0; j < len(result[i]); j++ {
+      if des.Keys[i][j] != result[i][j] {
+        t.Errorf("DES subkey %d is invalid", i+1)
+      }
+    }
+  }  
+}
+
+func TestDESencrypt(t *testing.T) {
+  key := Key(Bits{}.Read("00111011 00111000 10011000 00110111 00010101 00100000 11110111 01011110"))
+  des := NewDESCipher(Key(key))
+
+  msg := des.Encrypt(key)
+  fmt.Println(Bits(msg))
+
 }

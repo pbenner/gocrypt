@@ -18,7 +18,7 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
+import "fmt"
 
 /* -------------------------------------------------------------------------- */
 
@@ -40,15 +40,16 @@ func NewFeistelNetwork(blockLength int, keys [][]byte, f RoundFunction) FeistelN
 func (network FeistelNetwork) encryptBlock(input, output, fTmp []byte) {
   l := network.BlockLength
   // variables at the end of a round
-  Li := output[0:l/2]
-  Ri := output[l/2:l]
+  Lj := output[0:l/2]
+  Rj := output[l/2:l]
   // let j = i+1
-  Lj := input[0:l/2]
-  Rj := input[l/2:l]
+  Li := input[0:l/2]
+  Ri := input[l/2:l]
+  fmt.Println("L0:", Bits(Lj))
+  fmt.Println("R0:", Bits(Rj))
   // apply encryption multiple times
   for i := 0; i < len(network.Keys); i++ {
-    // swap i and j
-    Li, Ri, Lj, Rj = Lj, Rj, Li, Ri
+    fmt.Println("Round:", i)
     // copy Ri to Lj
     for k := 0; k < l/2; k++ {
       Lj[k] = Ri[k]
@@ -57,6 +58,11 @@ func (network FeistelNetwork) encryptBlock(input, output, fTmp []byte) {
     network.F(network.Keys[i], Ri, fTmp)
     // encrypte Li and store result in Rj
     xorSlice(Li, fTmp, Rj)
+    fmt.Println("Li:", Bits(Lj))
+    fmt.Println("Ri:", Bits(Rj))
+    fmt.Println()
+    // swap i and j
+    Li, Ri, Lj, Rj = Lj, Rj, Li, Ri
   }
 }
 
@@ -73,6 +79,7 @@ func (network FeistelNetwork) Encrypt(input []byte) []byte {
     oBlock := output[i:i+l]
     copy(iTmp, iBlock)
     network.encryptBlock(iTmp, oBlock, fTmp)
+    fmt.Println("feistel result:", Bits(oBlock))
   }
   return output
 }
