@@ -32,3 +32,80 @@ func TestBitsRead(t *testing.T) {
     t.Error("reading bits from string failed")
   }
 }
+
+/* -------------------------------------------------------------------------- */
+
+func TestRotateSlice1(t *testing.T) {
+
+  x := []byte{122,10,1,33,4}
+  y := make([]byte, len(x))
+
+  Bits(y).Rotate(x, -2)
+
+  if y[0] != (x[0] >> 2) + (x[1] << 6) {
+    t.Error("rotate test failed")
+  }
+  if y[1] != (x[1] >> 2) + (x[2] << 6) {
+    t.Error("rotate test failed")
+  }
+  if y[2] != (x[2] >> 2) + (x[3] << 6) {
+    t.Error("rotate test failed")
+  }
+  if y[3] != (x[3] >> 2) + (x[4] << 6) {
+    t.Error("rotate test failed")
+  }
+  if y[4] != (x[4] >> 2) + (x[0] << 6) {
+    t.Error("rotate test failed")
+  }
+
+}
+
+func TestRotateSlice2(t *testing.T) {
+
+  x := []byte{122,10,1,33,4}
+  y := make([]byte, len(x))
+
+  Bits(y).Rotate(x, -10)
+
+  if y[4] != (x[0] >> 2) + (x[1] << 6) {
+    t.Error("rotate test failed")
+  }
+  if y[0] != (x[1] >> 2) + (x[2] << 6) {
+    t.Error("rotate test failed")
+  }
+  if y[1] != (x[2] >> 2) + (x[3] << 6) {
+    t.Error("rotate test failed")
+  }
+  if y[2] != (x[3] >> 2) + (x[4] << 6) {
+    t.Error("rotate test failed")
+  }
+  if y[3] != (x[4] >> 2) + (x[0] << 6) {
+    t.Error("rotate test failed")
+  }
+
+}
+
+func TestRotateSlice3(t *testing.T) {
+
+  x := []byte{122,10,1,33,4}
+  y := make([]byte, len(x))
+
+  Bits(y).Rotate(x, 13)
+
+  if y[1] != (x[0] << 5) + (x[4] >> 3) {
+    t.Error("rotate test failed")
+  }
+  if y[2] != (x[1] << 5) + (x[0] >> 3) {
+    t.Error("rotate test failed")
+  }
+  if y[3] != (x[2] << 5) + (x[1] >> 3) {
+    t.Error("rotate test failed")
+  }
+  if y[4] != (x[3] << 5) + (x[2] >> 3) {
+    t.Error("rotate test failed")
+  }
+  if y[0] != (x[4] << 5) + (x[3] >> 3) {
+    t.Error("rotate test failed")
+  }
+
+}

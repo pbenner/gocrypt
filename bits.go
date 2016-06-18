@@ -70,3 +70,61 @@ func (Bits) Read(str string) Bits {
   }
   return r
 }
+
+/* -------------------------------------------------------------------------- */
+
+func (y Bits) RotateLeft(x []byte, n uint) {
+  var tmp1, tmp2 byte
+  l := len(x)
+  m := (n/8) % uint(l)
+  k := n % 8
+  for i := 0; i < l; i++ {
+    y[(i+int(m))%l] = x[i]
+  }
+  for i := 0; i < l; i++ {
+    tmp1 = (y[i] << k) | tmp2
+    tmp2 = (y[i] >> (8-k))
+    y[i] = tmp1
+  }
+  y[0] = y[0] + tmp2
+}
+
+func (y Bits) RotateRight(x []byte, n uint) {
+  var tmp1, tmp2 byte
+  l := len(x)
+  m := int((n/8) % uint(l))
+  k := n % 8
+  for i := 0; i < l; i++ {
+    y[(i+int(l-m))%l] = x[i]
+  }
+  for i := l-1; i >= 0; i-- {
+    tmp1 = (y[i] >> k) | tmp2
+    tmp2 = (y[i] << (8-k))
+    y[i] = tmp1
+  }
+  y[l-1] = y[l-1] + tmp2
+}
+
+func (y Bits) Rotate(x []byte, n int) {
+  if n < 0 {
+    y.RotateRight(x, uint(-n))
+  } else {
+    y.RotateLeft(x, uint(n))
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
+// compute element-wise xor: z = x (+) y
+func (z Bits) Xor(x, y []byte) {
+  for i := 0; i < len(x); i++ {
+    z[i] = x[i] ^ y[i]
+  }
+}
+
+func reverseByte(b byte) byte {
+   b = (b & 0xF0) >> 4 | (b & 0x0F) << 4
+   b = (b & 0xCC) >> 2 | (b & 0x33) << 2
+   b = (b & 0xAA) >> 1 | (b & 0x55) << 1
+   return b
+}

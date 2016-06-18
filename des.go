@@ -179,7 +179,7 @@ func desRoundFunction(key, input, output []byte) {
   // expand input
   BitmapInjective(input, tmp1, desFexpansion)
   // xor result with key
-  xorSlice(tmp1, key, tmp1)
+  Bits(tmp1).Xor(tmp1, key)
   // send result through s-boxes
   desSbox(tmp1, tmp2)
   // permute output of s-boxes

@@ -58,7 +58,7 @@ func (network FeistelNetwork) encryptBlock(input, output, iTmp, fTmp []byte) {
     // call F function
     network.F(network.Keys[i], Ri, fTmp)
     // encrypte Li and store result in Rj
-    xorSlice(Li, fTmp, Rj)
+    Bits(Rj).Xor(Li, fTmp)
   }
   for i := 0; i < l/2; i++ {
     output[i], output[l/2+i] = Rj[i], Lj[i]
