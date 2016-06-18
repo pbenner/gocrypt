@@ -183,7 +183,7 @@ func desRoundFunction(key, input, output []byte) {
   // send result through s-boxes
   desSbox(tmp1, tmp2)
   // permute output of s-boxes
-  ClearSlice(output)
+  Bits(output).Clear()
   BitmapInjective(tmp2, output, desFsboxP)
 }
 
@@ -244,7 +244,7 @@ func (cipher DESCipher) Encrypt(input []byte) []byte {
   }
   // encrypt message
   tmp2 := cipher.FeistelNetwork.Encrypt(tmp1)
-  ClearSlice(tmp1)
+  Bits(tmp1).Clear()
   // apply final permutation
   for i := 0; i < len(input); i += cipher.BlockLength {
     BitmapInjective(tmp2[i:i+bl], tmp1[i:i+bl], desFP)

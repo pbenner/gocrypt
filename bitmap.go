@@ -57,14 +57,6 @@ func ReverseBits(input, output []byte) {
 
 /* -------------------------------------------------------------------------- */
 
-func ClearSlice(x []byte) {
-  for i := 0; i < len(x); i++ {
-    x[i] = 0
-  }
-}
-
-/* -------------------------------------------------------------------------- */
-
 // Surjective mapping of input bits to output bits. The mapping
 // is defined by the table. The ith bit in the input slice is
 // mapped to position j = table[i] in the output.
