@@ -198,24 +198,7 @@ func (DESCipher) RotateKeyOnce(key []byte) {
     // swap tmp1 and tmp2
     tmp1, tmp2 = tmp2, tmp1
   }
-  // get old bit 1 now at bit 48
-  tmp1 = (key[6] & 0x80) >> 7
-  // get old bit 29 nor at bit 28
-  tmp2 = (key[3] & 0x08) >> 3
-  if tmp2 == 1 {
-    // set old bit 48
-    key[6] |= (1 << 7)
-  } else {
-    // clr old bit 48
-    key[6] &= 0x7F
-  }
-  if tmp1 == 1 {
-    // set old bit 28
-    key[3] |= (1 << 3)
-  } else {
-    // clr old bit 28
-    key[3] &= 0xF7
-  }
+  Bits(key).Swap(27, 55)
 }
 
 func (des DESCipher) RotateKey(key []byte, n int) {
