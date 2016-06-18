@@ -28,7 +28,7 @@ func TestDESsBox(t *testing.T) {
   output := make([]byte, 4)
   result := Bits{}.Read("11010110 00111010 11001110 00101001")
 
-  desSbox(input, output)
+  DESCipher{}.Sbox(input, output)
 
   for i := 0; i < 4; i++ {
     if output[i] != result[i] {

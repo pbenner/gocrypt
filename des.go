@@ -150,7 +150,7 @@ var desKeyRotation = []int{
 
 /* -------------------------------------------------------------------------- */
 
-func desSbox(input, output []byte) {
+func (DESCipher) Sbox(input, output []byte) {
   i1 := input[0] & 0x3F
   i2 := (input[0] >> 6) | ((input[1] & 0xF) << 2)
   i3 := (input[1] >> 4) | ((input[2] & 0x3) << 4)
@@ -173,7 +173,7 @@ func desSbox(input, output []byte) {
   output[3] = o7 + (o8 << 4)
 }
 
-func desRoundFunction(key, input, output []byte) {
+func (des DESCipher) RoundFunction(key, input, output []byte) {
   tmp1 := make([]byte, 48/8)
   tmp2 := make([]byte, 32/8)
   // expand input
@@ -181,13 +181,13 @@ func desRoundFunction(key, input, output []byte) {
   // xor result with key
   Bits(tmp1).Xor(tmp1, key)
   // send result through s-boxes
-  desSbox(tmp1, tmp2)
+  des.Sbox(tmp1, tmp2)
   // permute output of s-boxes
   Bits(output).Clear()
   BitmapInjective(tmp2, output, desFsboxP)
 }
 
-func desSplitRotateKeyOnce(key []byte) {
+func (DESCipher) RotateKeyOnce(key []byte) {
   var tmp1, tmp2 byte
   tmp1 = key[0] & 0x1
   for i := 6; i >= 0; i-- {
@@ -217,9 +217,9 @@ func desSplitRotateKeyOnce(key []byte) {
   }
 }
 
-func desSplitRotateKey(key []byte, n int) {
+func (des DESCipher) RotateKey(key []byte, n int) {
   for i := 0; i < n; i++ {
-    desSplitRotateKeyOnce(key)
+    des.RotateKeyOnce(key)
   }
 }
 
@@ -229,7 +229,7 @@ func NewDESCipher(key Key) DESCipher {
   cipher := DESCipher{}
   cipher.GenerateSubkeys(key)
   cipher.BlockLength = 64/8
-  cipher.F           = desRoundFunction
+  cipher.F           = cipher.RoundFunction
   return cipher
 }
 
@@ -261,7 +261,7 @@ func (cipher *DESCipher) GenerateSubkeys(key []byte) {
     // allocate memory
     cipher.Keys[i] = make([]byte, 48/8)
     // rotate bits
-    desSplitRotateKey(tmp, desKeyRotation[i])
+    cipher.RotateKey(tmp, desKeyRotation[i])
     // apply permutation choice 2
     BitmapInjective(tmp, cipher.Keys[i], desKeyPC2)
   }
