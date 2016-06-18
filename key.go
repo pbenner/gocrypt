@@ -19,9 +19,12 @@ package lib
 /* -------------------------------------------------------------------------- */
 
 //import "fmt"
-import "math"
+import "bufio"
 import "encoding/binary"
 import "encoding/base64"
+import "io/ioutil"
+import "math"
+import "os"
 
 /* type definition
  * -------------------------------------------------------------------------- */
@@ -57,6 +60,41 @@ func (k Key) Uint64Slice() []uint64 {
     result[i/step] = binary.LittleEndian.Uint64(tmp)
   }
   return result
+}
+
+/* i/o
+ * -------------------------------------------------------------------------- */
+
+func (key *Key) Read(filename string) error {
+  var keystr string
+
+  f, err := os.Open(filename)
+  if err != nil {
+    return err
+  }
+  defer f.Close()
+
+  scanner := bufio.NewScanner(f)
+
+  for scanner.Scan() {
+    keystr = keystr + scanner.Text()
+  }
+  tmp, err := base64.StdEncoding.DecodeString(string(keystr))
+
+  if err != nil {
+    return err
+  }
+  *key = tmp
+
+  return nil
+}
+
+func (key Key) Write(filename string) error {
+
+  if err := ioutil.WriteFile(filename, []byte(key.String()), 0666); err != nil {
+    return err
+  }
+  return nil
 }
 
 func (k Key) String() string {
