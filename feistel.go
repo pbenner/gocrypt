@@ -18,7 +18,7 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-import "fmt"
+//import "fmt"
 
 /* -------------------------------------------------------------------------- */
 
@@ -37,19 +37,20 @@ func NewFeistelNetwork(blockLength int, keys [][]byte, f RoundFunction) FeistelN
   return FeistelNetwork{blockLength, keys, f}
 }
 
-func (network FeistelNetwork) encryptBlock(input, output, fTmp []byte) {
+func (network FeistelNetwork) encryptBlock(input, output, iTmp, fTmp []byte) {
   l := network.BlockLength
+  // copy input
+  copy(iTmp, input)
   // variables at the end of a round
-  Lj := output[0:l/2]
-  Rj := output[l/2:l]
+  Li := output[0:l/2]
+  Ri := output[l/2:l]
   // let j = i+1
-  Li := input[0:l/2]
-  Ri := input[l/2:l]
-  fmt.Println("L0:", Bits(Lj))
-  fmt.Println("R0:", Bits(Rj))
+  Lj := iTmp[0:l/2]
+  Rj := iTmp[l/2:l]
   // apply encryption multiple times
   for i := 0; i < len(network.Keys); i++ {
-    fmt.Println("Round:", i)
+    // swap i and j
+    Li, Ri, Lj, Rj = Lj, Rj, Li, Ri
     // copy Ri to Lj
     for k := 0; k < l/2; k++ {
       Lj[k] = Ri[k]
@@ -58,11 +59,9 @@ func (network FeistelNetwork) encryptBlock(input, output, fTmp []byte) {
     network.F(network.Keys[i], Ri, fTmp)
     // encrypte Li and store result in Rj
     xorSlice(Li, fTmp, Rj)
-    fmt.Println("Li:", Bits(Lj))
-    fmt.Println("Ri:", Bits(Rj))
-    fmt.Println()
-    // swap i and j
-    Li, Ri, Lj, Rj = Lj, Rj, Li, Ri
+  }
+  for i := 0; i < l/2; i++ {
+    output[i], output[l/2+i] = Rj[i], Lj[i]
   }
 }
 
@@ -73,13 +72,11 @@ func (network FeistelNetwork) Encrypt(input []byte) []byte {
   fTmp := make([]byte, l/2)
   // allocate memory for holding the output
   output := make([]byte, len(input))
-  // make a copy the input since EncryptBlock 
+  // loop over message and encrypt each block
   for i := 0; i < len(input); i += l {
     iBlock := input [i:i+l]
     oBlock := output[i:i+l]
-    copy(iTmp, iBlock)
-    network.encryptBlock(iTmp, oBlock, fTmp)
-    fmt.Println("feistel result:", Bits(oBlock))
+    network.encryptBlock(iBlock, oBlock, iTmp, fTmp)
   }
   return output
 }

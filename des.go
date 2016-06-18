@@ -18,8 +18,7 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-import "fmt"
-//import "strconv"
+//import "fmt"
 
 /* -------------------------------------------------------------------------- */
 
@@ -179,18 +178,13 @@ func desRoundFunction(key, input, output []byte) {
   tmp2 := make([]byte, 32/8)
   // expand input
   BitmapInjective(input, tmp1, desFexpansion)
-  fmt.Println("E :", Bits(tmp1))
-  fmt.Println("KS:", Bits(key))
   // xor result with key
   xorSlice(tmp1, key, tmp1)
-  fmt.Println("E xor KS:", Bits(tmp1))
   // send result through s-boxes
   desSbox(tmp1, tmp2)
-  fmt.Println("Sbox:", Bits(tmp2))
   // permute output of s-boxes
   ClearSlice(output)
   BitmapInjective(tmp2, output, desFsboxP)
-  fmt.Println("P  :", Bits(output))
 }
 
 func desSplitRotateKeyOnce(key []byte) {
@@ -250,7 +244,6 @@ func (cipher DESCipher) Encrypt(input []byte) []byte {
   }
   // encrypt message
   tmp2 := cipher.FeistelNetwork.Encrypt(tmp1)
-  fmt.Println("LR[16]:", Bits(tmp2))
   ClearSlice(tmp1)
   // apply final permutation
   for i := 0; i < len(input); i += cipher.BlockLength {

@@ -27,7 +27,7 @@ func TestFeistel(t *testing.T) {
 
   // Feistel network with just one round and a block length
   // of two bytes. Let input = [L0, R0], then the output =
-  // [L1,R1] is given by L1 = R0 and R1 = L0 (+) R0.
+  // [L1,R1] is given by R1 = R0 and L1 = L0 (+) R0.
 
   k := make([][]byte, 1)
   f := func(key, input, output []byte) {
@@ -40,10 +40,10 @@ func TestFeistel(t *testing.T) {
   input  := []byte{13,3}
   output := network.Encrypt(input)
 
-  if output[0] != 3 {
+  if output[1] != 3 {
     t.Error("bitmap test failed")
   }
-  if output[1] != 14 {
+  if output[0] != 14 {
     t.Error("bitmap test failed")
   }
 }

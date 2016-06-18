@@ -18,7 +18,7 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-import "fmt"
+//import "fmt"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
@@ -72,8 +72,13 @@ func TestDESkeys(t *testing.T) {
 func TestDESencrypt(t *testing.T) {
   key := Key(Bits{}.Read("00111011 00111000 10011000 00110111 00010101 00100000 11110111 01011110"))
   des := NewDESCipher(Key(key))
-
   msg := des.Encrypt(key)
-  fmt.Println(Bits(msg))
 
+  result := Bits{}.Read("10001111 00000011 01000101 01101101 00111111 01111000 11100010 11000101")
+
+  for i := 0; i < len(result); i++ {
+    if result[i] != msg[i] {
+      t.Error("DES encryption failed")
+    }
+  }
 }
