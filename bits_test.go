@@ -33,6 +33,35 @@ func TestBitsRead(t *testing.T) {
   }
 }
 
+func TestBitsSetClr(t *testing.T) {
+
+  bits1 := Bits{}.Read("01001011 00000001 01011000 11110001 11000001 01111000 00111001 01010011")
+  bits2 := Bits{}.Read("01001011 00100001 00011000 11110001 11000001 01111000 00111001 01010011")
+
+  bits1.Set(10)
+  bits1.Clr(17)
+
+  for i := 0; i < len(bits1); i++ {
+    if bits1[i] != bits2[i] {
+      t.Error("set/clr bits failed")
+    }
+  }
+}
+
+func TestBitsSwap(t *testing.T) {
+
+  bits1 := Bits{}.Read("01001011 00000001 01011000 11110001 11000001 01111000 00111001 01010011")
+  bits2 := Bits{}.Read("01001011 00000001 01011000 11101001 11000001 01111000 00111001 01010011")
+
+  bits1.Swap(27, 28)
+
+  for i := 0; i < len(bits1); i++ {
+    if bits1[i] != bits2[i] {
+      t.Error("swapping bits failed")
+    }
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 
 func TestRotateSlice1(t *testing.T) {
@@ -265,5 +294,4 @@ func TestMapInjective(t *testing.T) {
       t.Error("bitmap test failed")
     }
   }
-
 }

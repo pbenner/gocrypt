@@ -141,6 +141,29 @@ func (x Bits) Clear() {
   }
 }
 
+func (x Bits) Set(i int) {
+  x[i/8] |= 1 << uint(i%8)
+}
+
+func (x Bits) Clr(i int) {
+  x[i/8] &= ^(1 << uint(i%8))
+}
+
+func (x Bits) Swap(i, j int) {
+  b1 := x[i/8] & (1 << byte(i%8))
+  b2 := x[j/8] & (1 << byte(j%8))
+  if b1 != 0 {
+    x.Set(j)
+  } else {
+    x.Clr(j)
+  }
+  if b2 != 0 {
+    x.Set(i)
+  } else {
+    x.Clr(i)
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 
 func reduceTableInjective(table [][]int, result []int) error {
