@@ -45,7 +45,8 @@ func init() {
       row := (b1 << 1) + (b6 << 0)
       col := (b2 << 3) + (b3 << 2) + (b4 << 1) + (b5 << 0)
       k := row*16 + col
-      output[i] = reverseByte(input[k]) >> 4
+      Bits(output[i:i+1]).Reverse(input[k:k+1])
+      output[i] >>= 4
     }
     return output
   }

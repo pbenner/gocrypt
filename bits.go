@@ -122,11 +122,16 @@ func (z Bits) Xor(x, y []byte) {
   }
 }
 
-func reverseByte(b byte) byte {
-   b = (b & 0xF0) >> 4 | (b & 0x0F) << 4
-   b = (b & 0xCC) >> 2 | (b & 0x33) << 2
-   b = (b & 0xAA) >> 1 | (b & 0x55) << 1
-   return b
+func (y Bits) Reverse(x []byte) {
+  for i := 0; i < len(x); i++ {
+    y[i] = x[i]
+    y[i] = (y[i] & 0xF0) >> 4 | (y[i] & 0x0F) << 4
+    y[i] = (y[i] & 0xCC) >> 2 | (y[i] & 0x33) << 2
+    y[i] = (y[i] & 0xAA) >> 1 | (y[i] & 0x55) << 1
+  }
+  for i := 0; i < len(y)/2; i++ {
+    y[i], y[len(y)-i-1] = y[len(y)-i-1], y[i]
+  }
 }
 
 func (x Bits) Clear() {

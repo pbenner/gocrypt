@@ -44,19 +44,6 @@ func reduceTableInjective(table [][]int, result []int) error {
 
 /* -------------------------------------------------------------------------- */
 
-func ReverseBits(input, output []byte) {
-  n := len(input)
-  for i := 0; i < 8*n; i++ {
-    j := i/8
-    k := n - i/8 - 1
-    if input[j] & (1 << uint(i % 8)) != 0 {
-      output[k] |= (1 << uint(7 - (i%8)))
-    }
-  }
-}
-
-/* -------------------------------------------------------------------------- */
-
 // Surjective mapping of input bits to output bits. The mapping
 // is defined by the table. The ith bit in the input slice is
 // mapped to position j = table[i] in the output.

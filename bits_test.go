@@ -109,3 +109,17 @@ func TestRotateSlice3(t *testing.T) {
   }
 
 }
+
+func TestBitsReverse(t *testing.T) {
+  input  := Bits{}.Read("11111100 10001011 00011011 10010101 01110001 00011101")
+  output := Bits(make([]byte, len(input)))
+  output.Reverse(input)
+
+  result := Bits{}.Read("10111000 10001110 10101001 11011000 11010001 00111111")
+
+  for i := 0; i < 4; i++ {
+    if output[i] != result[i] {
+      t.Errorf("reversing bits failed")
+    }
+  }
+}
