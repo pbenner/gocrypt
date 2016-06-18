@@ -178,14 +178,14 @@ func (des DESCipher) RoundFunction(key, input, output []byte) {
   tmp1 := make([]byte, 48/8)
   tmp2 := make([]byte, 32/8)
   // expand input
-  BitmapInjective(input, tmp1, desFexpansion)
+  Bits(tmp1).MapInjective(input, desFexpansion)
   // xor result with key
   Bits(tmp1).Xor(tmp1, key)
   // send result through s-boxes
   des.Sbox(tmp1, tmp2)
   // permute output of s-boxes
   Bits(output).Clear()
-  BitmapInjective(tmp2, output, desFsboxP)
+  Bits(output).MapInjective(tmp2, desFsboxP)
 }
 
 func (DESCipher) RotateKeyOnce(key []byte) {
@@ -241,14 +241,14 @@ func (cipher DESCipher) Encrypt(input []byte) []byte {
   bl   := cipher.BlockLength
   // apply initial permutation
   for i := 0; i < len(input); i += cipher.BlockLength {
-    BitmapInjective(input[i:i+bl], tmp1[i:i+bl], desIP)
+    Bits(tmp1[i:i+bl]).MapInjective(input[i:i+bl], desIP)
   }
   // encrypt message
   tmp2 := cipher.FeistelNetwork.Encrypt(tmp1)
   Bits(tmp1).Clear()
   // apply final permutation
   for i := 0; i < len(input); i += cipher.BlockLength {
-    BitmapInjective(tmp2[i:i+bl], tmp1[i:i+bl], desFP)
+    Bits(tmp1[i:i+bl]).MapInjective(tmp2[i:i+bl], desFP)
   }
   return tmp1
 }
@@ -257,13 +257,13 @@ func (cipher *DESCipher) GenerateSubkeys(key []byte) {
   tmp := make([]byte, 56/8)
   cipher.Keys = make([][]byte, 16)
   // apply permutation choice 1
-  BitmapInjective(key, tmp, desKeyPC1)
+  Bits(tmp).MapInjective(key, desKeyPC1)
   for i := 0; i < 16; i++ {
     // allocate memory
     cipher.Keys[i] = make([]byte, 48/8)
     // rotate bits
     cipher.RotateKey(tmp, desKeyRotation[i])
     // apply permutation choice 2
-    BitmapInjective(tmp, cipher.Keys[i], desKeyPC2)
+    Bits(cipher.Keys[i]).MapInjective(tmp, desKeyPC2)
   }
 }

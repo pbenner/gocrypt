@@ -123,3 +123,147 @@ func TestBitsReverse(t *testing.T) {
     }
   }
 }
+
+/* -------------------------------------------------------------------------- */
+
+func TestMapSurjective(t *testing.T) {
+
+  table := []int{
+    1,  2, 10,  4,  5,  6,  7,  8,
+    9,  3, 11, 12, 13, 14, 15, 16}
+  input  := []byte{4,0}
+  output := []byte{0,0}
+
+  Bits(output).MapSurjective(input, table)
+
+  if output[0] != 0 {
+    t.Error("bitmap test failed")
+  }
+  if output[1] != 2 {
+    t.Error("bitmap test failed")
+  }
+}
+
+func TestMap(t *testing.T) {
+
+  table := [][]int{
+    { 2, 48},
+    { 3},
+    { 4},
+    { 5,  7},
+    { 8,  6},
+    { 9},
+    {10},
+    {11, 13},
+    {14, 12},
+    {15},
+    {16},
+    {17, 19},
+    {20, 18},
+    {21},
+    {22},
+    {23, 25},
+    {26, 24},
+    {27},
+    {28},
+    {29, 31},
+    {32, 30},
+    {33},
+    {34},
+    {35, 37},
+    {38, 36},
+    {39},
+    {40},
+    {41, 43},
+    {44, 42},
+    {45},
+    {46},
+    {47,  1} }
+
+  input  := []byte{0,0,1,1<<7}
+  output := []byte{0,0,0,0,0,0}
+
+  Bits(output).Map(input, table)
+
+  if output[0] != 1 {
+    t.Error("bitmap test failed")
+  }
+  if output[1] != 0 {
+    t.Error("bitmap test failed")
+  }
+  if output[2] != (1<<7) {
+    t.Error("bitmap test failed")
+  }
+  if output[3] != (1<<1) {
+    t.Error("bitmap test failed")
+  }
+  if output[4] != 0 {
+    t.Error("bitmap test failed")
+  }
+  if output[5] != (1<<6) {
+    t.Error("bitmap test failed")
+  }
+  // fmt.Println("input[0]:", strconv.FormatInt(int64(input[0]), 2))
+  // fmt.Println("input[1]:", strconv.FormatInt(int64(input[1]), 2))
+  // fmt.Println("input[2]:", strconv.FormatInt(int64(input[2]), 2))
+  // fmt.Println("input[3]:", strconv.FormatInt(int64(input[3]), 2))
+
+  // fmt.Println("output[0]:", strconv.FormatInt(int64(output[0]), 2))
+  // fmt.Println("output[1]:", strconv.FormatInt(int64(output[1]), 2))
+  // fmt.Println("output[2]:", strconv.FormatInt(int64(output[2]), 2))
+  // fmt.Println("output[3]:", strconv.FormatInt(int64(output[3]), 2))
+  // fmt.Println("output[4]:", strconv.FormatInt(int64(output[4]), 2))
+  // fmt.Println("output[5]:", strconv.FormatInt(int64(output[5]), 2))
+}
+
+func TestMapInjective(t *testing.T) {
+  table1 := [][]int{
+    { 2, 48},
+    { 3},
+    { 4},
+    { 5,  7},
+    { 8,  6},
+    { 9},
+    {10},
+    {11, 13},
+    {14, 12},
+    {15},
+    {16},
+    {17, 19},
+    {20, 18},
+    {21},
+    {22},
+    {23, 25},
+    {26, 24},
+    {27},
+    {28},
+    {29, 31},
+    {32, 30},
+    {33},
+    {34},
+    {35, 37},
+    {38, 36},
+    {39},
+    {40},
+    {41, 43},
+    {44, 42},
+    {45},
+    {46},
+    {47,  1} }
+  table2 := make([]int, 48)
+  reduceTableInjective(table1, table2)
+
+  input   := []byte{0,0,1,1<<7}
+  output1 := []byte{0,0,0,0,0,0}
+  output2 := []byte{0,0,0,0,0,0}
+
+  Bits(output1).Map         (input, table1)
+  Bits(output2).MapInjective(input, table2)
+
+  for i := 0; i < len(output1); i++ {
+    if output1[i] != output2[i] {
+      t.Error("bitmap test failed")
+    }
+  }
+
+}
