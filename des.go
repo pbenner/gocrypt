@@ -188,14 +188,10 @@ func (des DESCipher) RoundFunction(key, input, output []byte) {
   Bits(output).MapInjective(tmp2, desFsboxP)
 }
 
-func (DESCipher) RotateKeyOnce(key []byte) {
-  Bits(key).Rotate(key, -1)
-  Bits(key).Swap(27, 55)
-}
-
 func (des DESCipher) RotateKey(key []byte, n int) {
   for i := 0; i < n; i++ {
-    des.RotateKeyOnce(key)
+    Bits(key).Rotate(key, -1)
+    Bits(key).Swap(27, 55)
   }
 }
 
