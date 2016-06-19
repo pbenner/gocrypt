@@ -21,6 +21,8 @@ package lib
 //import "fmt"
 import "testing"
 
+import "crypto/des"
+
 /* -------------------------------------------------------------------------- */
 
 func TestDESsBox(t *testing.T) {
@@ -61,7 +63,7 @@ func TestDESkeys(t *testing.T) {
   des := NewDESCipher(key)
 
   for i := 0; i < len(result); i++ {
-    if ! Bits(des.Keys[i]).Equals(result[i]) {
+    if !Bits(des.Keys[i]).Equals(result[i]) {
       t.Errorf("DES subkey %d is invalid", i+1)
     }
   }
@@ -71,21 +73,35 @@ func TestDESencrypt(t *testing.T) {
   key := Key(Bits{}.Read("00111011 00111000 10011000 00110111 00010101 00100000 11110111 01011110"))
   // simply use the key as message
   msg := key
-  des := NewDESCipher(Key(key))
+  des := NewDESCipher(key)
 
   encrypted := des.Encrypt(msg)
   decrypted := des.Decrypt(encrypted)
 
   result := Bits{}.Read("10001111 00000011 01000101 01101101 00111111 01111000 11100010 11000101")
 
-  for i := 0; i < len(result); i++ {
-    if result[i] != encrypted[i] {
-      t.Error("DES encryption failed")
-    }
+  if !Bits(result).Equals(encrypted) {
+    t.Error("DES encryption failed")
   }
-  for i := 0; i < len(result); i++ {
-    if msg[i] != decrypted[i] {
-      t.Error("DES decryption failed")
-    }
+  if !Bits(msg).Equals(decrypted) {
+    t.Error("DES decryption failed")
   }
+}
+
+func TestDESgodes(t *testing.T) {
+
+	key       := []byte{0x3b, 0x38, 0x98, 0x37, 0x15, 0x20, 0xf7, 0x5e}
+	plaintext := []byte("12345678")
+
+  des1    := NewDESCipher(key)
+	des2, _ := des.NewCipher(key)
+
+  ciphertext1 := des1.Encrypt(plaintext)
+	ciphertext2 := make([]byte, len(plaintext))
+  des2.Encrypt(ciphertext2, plaintext)
+
+  if !Bits(ciphertext1).Equals(ciphertext2) {
+    t.Error("DES encryption failed")
+  }
+
 }
