@@ -63,7 +63,7 @@ func TestDESkeys(t *testing.T) {
   for i := 0; i < len(result); i++ {
     if ! Bits(des.Keys[i]).Equals(result[i]) {
       t.Errorf("DES subkey %d is invalid", i+1)
-      }
+    }
   }
 }
 
