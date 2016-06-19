@@ -90,16 +90,20 @@ func TestDESencrypt(t *testing.T) {
 
 func TestDESgodes(t *testing.T) {
 
-	key       := []byte{0x3b, 0x38, 0x98, 0x37, 0x15, 0x20, 0xf7, 0x5e}
+  key1 := Key(Bits{}.Read("00111011 00111000 10011000 00110111 00010101 00100000 11110111 01011110"))
+	key2 := []byte{0x3b, 0x38, 0x98, 0x37, 0x15, 0x20, 0xf7, 0x5e}
 	plaintext := []byte("12345678")
 
-  des1    := NewDESCipher(key)
-	des2, _ := des.NewCipher(key)
+  des1    := NewDESCipher(key1)
+	des2, _ := des.NewCipher(key2)
 
   ciphertext1 := des1.Encrypt(plaintext)
 	ciphertext2 := make([]byte, len(plaintext))
   des2.Encrypt(ciphertext2, plaintext)
 
+  if !Bits(key1).Equals(key2) {
+    t.Error("DES encryption failed")
+  }
   if !Bits(ciphertext1).Equals(ciphertext2) {
     t.Error("DES encryption failed")
   }
