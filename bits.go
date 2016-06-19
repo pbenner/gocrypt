@@ -22,8 +22,6 @@ import "fmt"
 import "bufio"
 import "bytes"
 import "errors"
-import "strings"
-import "unicode"
 
 /* -------------------------------------------------------------------------- */
 
@@ -41,7 +39,7 @@ func (bits Bits) String() string {
       fmt.Fprintf(writer, " ")
     }
     for j := 0; j < 8; j++ {
-      if bits[i] & (1 << uint(j)) != 0 {
+      if bits[i] & (1 << uint(8-1-j)) != 0 {
         fmt.Fprintf(writer, "1")
       } else {
         fmt.Fprintf(writer, "0")
@@ -54,20 +52,24 @@ func (bits Bits) String() string {
 }
 
 func (Bits) Read(str string) Bits {
-  // strip all whitespace
-  str = strings.Map(func(r rune) rune {
-    if unicode.IsSpace(r) {
-    return -1
-  }
-    return r
-  }, str)
-  // allocate memory
-  r := make([]byte, divIntUp(len(str), 8))
-  // loope over string and convert each bit
-  for i := 0; i < len(str); i++ {
-    if str[i] == '1' {
-      r[i/8] |= 1 << uint(i%8)
+  r := []byte{}
+  // loop over string and convert each bit
+  for i := 0; i < len(str); i += 9 {
+    b := byte(0)
+    for j := 0; j < 8 && i+j < len(str); j++ {
+      k := i+j
+      if str[k] == '1' {
+        b |= 1 << byte(8-1-j)
+      } else if str[k] != '0' {
+        // error, invalid character
+        return nil
+      }
     }
+    if i+8 < len(str) && str[i+8] != ' ' {
+      // error, bytes need to be separated by space
+      return nil
+    }
+    r = append(r, b)
   }
   return r
 }
@@ -77,17 +79,17 @@ func (Bits) Read(str string) Bits {
 func (y Bits) RotateLeft(x []byte, n uint) {
   var tmp1, tmp2 byte
   l := len(x)
-  m := (n/8) % uint(l)
+  m := int((n/8) % uint(l))
   k := n % 8
   for i := 0; i < l; i++ {
-    y[(i+int(m))%l] = x[i]
+    y[(i+int(l-m))%l] = x[i]
   }
-  for i := 0; i < l; i++ {
+  for i := l-1; i >= 0; i-- {
     tmp1 = (y[i] << k) | tmp2
     tmp2 = (y[i] >> (8-k))
     y[i] = tmp1
   }
-  y[0] = y[0] + tmp2
+  y[l-1] = y[l-1] + tmp2
 }
 
 func (y Bits) RotateRight(x []byte, n uint) {
@@ -96,14 +98,14 @@ func (y Bits) RotateRight(x []byte, n uint) {
   m := int((n/8) % uint(l))
   k := n % 8
   for i := 0; i < l; i++ {
-    y[(i+int(l-m))%l] = x[i]
+    y[(i+int(m))%l] = x[i]
   }
-  for i := l-1; i >= 0; i-- {
+  for i := 0; i < l; i++ {
     tmp1 = (y[i] >> k) | tmp2
     tmp2 = (y[i] << (8-k))
     y[i] = tmp1
   }
-  y[l-1] = y[l-1] + tmp2
+  y[0] = y[0] + tmp2
 }
 
 func (y Bits) Rotate(x []byte, n int) {
@@ -115,6 +117,15 @@ func (y Bits) Rotate(x []byte, n int) {
 }
 
 /* -------------------------------------------------------------------------- */
+
+func (y Bits) Equals(x []byte) bool {
+  for i := 0; i < len(x); i++ {
+    if x[i] != y[i] {
+      return false
+    }
+  }
+  return true
+}
 
 // compute element-wise xor: z = x (+) y
 func (z Bits) Xor(x, y []byte) {
@@ -148,16 +159,16 @@ func (x Bits) Clear() {
 }
 
 func (x Bits) Set(i int) {
-  x[i/8] |= 1 << uint(i%8)
+  x[i/8] |= 1 << uint(7-i%8)
 }
 
 func (x Bits) Clr(i int) {
-  x[i/8] &= ^(1 << uint(i%8))
+  x[i/8] &= ^(1 << uint(7-i%8))
 }
 
 func (x Bits) Swap(i, j int) {
-  b1 := x[i/8] & (1 << byte(i%8))
-  b2 := x[j/8] & (1 << byte(j%8))
+  b1 := x[i/8] & (1 << byte(7-i%8))
+  b2 := x[j/8] & (1 << byte(7-j%8))
   if b1 != 0 {
     x.Set(j)
   } else {
@@ -205,8 +216,8 @@ func (output Bits) MapSurjective(input []byte, table []int) {
   for i := 0; i < n; i++ {
     // index of the output bit
     j := table[i]-1
-    if input[i/8]  & byte(1 << byte(i % 8)) != 0 {
-      output[j/8] |= byte(1 << byte(j % 8))
+    if input[i/8]  & byte(1 << byte(7 - (i % 8))) != 0 {
+      output[j/8] |= byte(1 << byte(7 - (j % 8)))
     }
   }
 }
@@ -225,8 +236,8 @@ func (output Bits) MapInjective(input []byte, table []int) {
   for j := 0; j < n; j++ {
     // index of the input bit
     i := table[j]-1
-    if input[i/8]  & byte(1 << byte(i % 8)) != 0 {
-      output[j/8] |= byte(1 << byte(j % 8))
+    if input[i/8]  & byte(1 << byte(7 - (i % 8))) != 0 {
+      output[j/8] |= byte(1 << byte(7 - (j % 8)))
     }
   }
 }
@@ -243,8 +254,8 @@ func (output Bits) Map(input []byte, table [][]int) {
     for k := 0; k < len(table[i]); k++ {
       // index of the output bit
       j := table[i][k]-1
-      if input[i/8]  & byte(1 << byte(i % 8)) != 0 {
-        output[j/8] |= byte(1 << byte(j % 8))
+      if input[i/8]  & byte(1 << byte(7 - (i % 8))) != 0 {
+        output[j/8] |= byte(1 << byte(7 - (j % 8)))
       }
     }
   }

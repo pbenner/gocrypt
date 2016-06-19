@@ -23,6 +23,17 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
+func TestBitsString(t *testing.T) {
+
+  str  := "00111011 00111000 10011000 00110111 00010101 00100000 11110111 01011110"
+	bits1 := Bits{}.Read(str)
+  bits2 := []byte{0x3b, 0x38, 0x98, 0x37, 0x15, 0x20, 0xf7, 0x5e}
+
+  if !bits1.Equals(bits2) {
+    t.Error("bits string failed")
+  }
+}
+
 func TestBitsRead(t *testing.T) {
 
   str1 := "01001011 00000001 01011000 11110001 11000001 01111000 00111001 01010011"
@@ -66,74 +77,39 @@ func TestBitsSwap(t *testing.T) {
 
 func TestRotateSlice1(t *testing.T) {
 
-  x := []byte{122,10,1,33,4}
+  x := Bits{}.Read("01111010 00001010 00000001 00100001 00000100")
   y := make([]byte, len(x))
+  z := Bits{}.Read("00011110 10000010 10000000 01001000 01000001")
 
   Bits(y).Rotate(x, -2)
 
-  if y[0] != (x[0] >> 2) + (x[1] << 6) {
+  if !Bits(y).Equals(z) {
     t.Error("rotate test failed")
   }
-  if y[1] != (x[1] >> 2) + (x[2] << 6) {
-    t.Error("rotate test failed")
-  }
-  if y[2] != (x[2] >> 2) + (x[3] << 6) {
-    t.Error("rotate test failed")
-  }
-  if y[3] != (x[3] >> 2) + (x[4] << 6) {
-    t.Error("rotate test failed")
-  }
-  if y[4] != (x[4] >> 2) + (x[0] << 6) {
-    t.Error("rotate test failed")
-  }
-
 }
 
 func TestRotateSlice2(t *testing.T) {
 
-  x := []byte{122,10,1,33,4}
+  x := Bits{}.Read("01111010 00001010 00000001 00100001 00000100")
   y := make([]byte, len(x))
+  z := Bits{}.Read("01000001 00011110 10000010 10000000 01001000")
 
   Bits(y).Rotate(x, -10)
 
-  if y[4] != (x[0] >> 2) + (x[1] << 6) {
+  if !Bits(y).Equals(z) {
     t.Error("rotate test failed")
   }
-  if y[0] != (x[1] >> 2) + (x[2] << 6) {
-    t.Error("rotate test failed")
-  }
-  if y[1] != (x[2] >> 2) + (x[3] << 6) {
-    t.Error("rotate test failed")
-  }
-  if y[2] != (x[3] >> 2) + (x[4] << 6) {
-    t.Error("rotate test failed")
-  }
-  if y[3] != (x[4] >> 2) + (x[0] << 6) {
-    t.Error("rotate test failed")
-  }
-
 }
 
 func TestRotateSlice3(t *testing.T) {
 
-  x := []byte{122,10,1,33,4}
+  x := Bits{}.Read("01111010 00001010 00000001 00100001 00000100")
   y := make([]byte, len(x))
+  z := Bits{}.Read("01000000 00100100 00100000 10001111 01000001")
 
   Bits(y).Rotate(x, 13)
 
-  if y[1] != (x[0] << 5) + (x[4] >> 3) {
-    t.Error("rotate test failed")
-  }
-  if y[2] != (x[1] << 5) + (x[0] >> 3) {
-    t.Error("rotate test failed")
-  }
-  if y[3] != (x[2] << 5) + (x[1] >> 3) {
-    t.Error("rotate test failed")
-  }
-  if y[4] != (x[3] << 5) + (x[2] >> 3) {
-    t.Error("rotate test failed")
-  }
-  if y[0] != (x[4] << 5) + (x[3] >> 3) {
+  if !Bits(y).Equals(z) {
     t.Error("rotate test failed")
   }
 
@@ -158,8 +134,8 @@ func TestBitsReverse(t *testing.T) {
 func TestMapSurjective(t *testing.T) {
 
   table := []int{
-    1,  2, 10,  4,  5,  6,  7,  8,
-    9,  3, 11, 12, 13, 14, 15, 16}
+    1,  2, 3,  4,  5,  15,  7,  8,
+    9,  6, 11, 12, 13, 14, 15, 16}
   input  := []byte{4,0}
   output := []byte{0,0}
 
@@ -209,40 +185,15 @@ func TestMap(t *testing.T) {
     {46},
     {47,  1} }
 
-  input  := []byte{0,0,1,1<<7}
-  output := []byte{0,0,0,0,0,0}
+  input  := Bits{}.Read("00000000 00000000 00000001 10000000")
+  output := Bits{}.Read("00000000 00000000 00000000 00000000 00000000 00000000")
+  result := Bits{}.Read("00000000 00000000 00000000 00000000 00111100 00000000")
 
   Bits(output).Map(input, table)
 
-  if output[0] != 1 {
+  if !Bits(output).Equals(result) {
     t.Error("bitmap test failed")
   }
-  if output[1] != 0 {
-    t.Error("bitmap test failed")
-  }
-  if output[2] != (1<<7) {
-    t.Error("bitmap test failed")
-  }
-  if output[3] != (1<<1) {
-    t.Error("bitmap test failed")
-  }
-  if output[4] != 0 {
-    t.Error("bitmap test failed")
-  }
-  if output[5] != (1<<6) {
-    t.Error("bitmap test failed")
-  }
-  // fmt.Println("input[0]:", strconv.FormatInt(int64(input[0]), 2))
-  // fmt.Println("input[1]:", strconv.FormatInt(int64(input[1]), 2))
-  // fmt.Println("input[2]:", strconv.FormatInt(int64(input[2]), 2))
-  // fmt.Println("input[3]:", strconv.FormatInt(int64(input[3]), 2))
-
-  // fmt.Println("output[0]:", strconv.FormatInt(int64(output[0]), 2))
-  // fmt.Println("output[1]:", strconv.FormatInt(int64(output[1]), 2))
-  // fmt.Println("output[2]:", strconv.FormatInt(int64(output[2]), 2))
-  // fmt.Println("output[3]:", strconv.FormatInt(int64(output[3]), 2))
-  // fmt.Println("output[4]:", strconv.FormatInt(int64(output[4]), 2))
-  // fmt.Println("output[5]:", strconv.FormatInt(int64(output[5]), 2))
 }
 
 func TestMapInjective(t *testing.T) {

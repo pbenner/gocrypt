@@ -61,12 +61,10 @@ func TestDESkeys(t *testing.T) {
   des := NewDESCipher(key)
 
   for i := 0; i < len(result); i++ {
-    for j := 0; j < len(result[i]); j++ {
-      if des.Keys[i][j] != result[i][j] {
-        t.Errorf("DES subkey %d is invalid", i+1)
+    if ! Bits(des.Keys[i]).Equals(result[i]) {
+      t.Errorf("DES subkey %d is invalid", i+1)
       }
-    }
-  }  
+  }
 }
 
 func TestDESencrypt(t *testing.T) {

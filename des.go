@@ -36,17 +36,10 @@ func init() {
     output := make([]byte, len(input))
 
     for i := 0; i < 64; i++ {
-      b1 := (i & (1 << 0) >> 0)
-      b2 := (i & (1 << 1) >> 1)
-      b3 := (i & (1 << 2) >> 2)
-      b4 := (i & (1 << 3) >> 3)
-      b5 := (i & (1 << 4) >> 4)
-      b6 := (i & (1 << 5) >> 5)
-      row := (b1 << 1) + (b6 << 0)
-      col := (b2 << 3) + (b3 << 2) + (b4 << 1) + (b5 << 0)
+      row := (i & 1) | ((i>>4) & 2)
+      col := (i >> 1) & 0xF
       k := row*16 + col
-      Bits(output[i:i+1]).Reverse(input[k:k+1])
-      output[i] >>= 4
+      output[i] = input[k]
     }
     return output
   }
@@ -152,14 +145,14 @@ var desKeyRotation = []int{
 /* -------------------------------------------------------------------------- */
 
 func (DESCipher) Sbox(input, output []byte) {
-  i1 := input[0] & 0x3F
-  i2 := (input[0] >> 6) | ((input[1] & 0xF) << 2)
-  i3 := (input[1] >> 4) | ((input[2] & 0x3) << 4)
-  i4 := (input[2] >> 2)
-  i5 := input[3] & 0x3F
-  i6 := (input[3] >> 6) | ((input[4] & 0xF) << 2)
-  i7 := (input[4] >> 4) | ((input[5] & 0x3) << 4)
-  i8 := (input[5] >> 2)
+  i1 := ((input[0] >> 2) & 0x3F)
+  i2 := ((input[0] << 4) & 0x3F) | (input[1] >> 4)
+  i3 := ((input[1] << 2) & 0x3F) | (input[2] >> 6)
+  i4 := ((input[2] << 0) & 0x3F)
+  i5 := ((input[3] >> 2) & 0x3F)
+  i6 := ((input[3] << 4) & 0x3F) | (input[4] >> 4)
+  i7 := ((input[4] << 2) & 0x3F) | (input[5] >> 6)
+  i8 := ((input[5] << 0) & 0x3F)
   o1 := desFsbox1[i1]
   o2 := desFsbox2[i2]
   o3 := desFsbox3[i3]
@@ -168,10 +161,10 @@ func (DESCipher) Sbox(input, output []byte) {
   o6 := desFsbox6[i6]
   o7 := desFsbox7[i7]
   o8 := desFsbox8[i8]
-  output[0] = o1 + (o2 << 4)
-  output[1] = o3 + (o4 << 4)
-  output[2] = o5 + (o6 << 4)
-  output[3] = o7 + (o8 << 4)
+  output[0] = (o1 << 4) + o2
+  output[1] = (o3 << 4) + o4
+  output[2] = (o5 << 4) + o6
+  output[3] = (o7 << 4) + o8
 }
 
 func (des DESCipher) RoundFunction(key, input, output []byte) {
@@ -190,7 +183,7 @@ func (des DESCipher) RoundFunction(key, input, output []byte) {
 
 func (des DESCipher) RotateKey(key []byte, n int) {
   for i := 0; i < n; i++ {
-    Bits(key).Rotate(key, -1)
+    Bits(key).Rotate(key, 1)
     Bits(key).Swap(27, 55)
   }
 }
