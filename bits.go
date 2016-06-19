@@ -135,6 +135,12 @@ func (y Bits) Reverse(x []byte) {
   }
 }
 
+func (y Bits) ReverseEndian(x []byte) {
+  for i := 0; i < len(y)/2; i++ {
+    y[i], y[len(y)-i-1] = x[len(y)-i-1], x[i]
+  }
+}
+
 func (x Bits) Clear() {
   for i := 0; i < len(x); i++ {
     x[i] = 0
