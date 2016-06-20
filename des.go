@@ -184,7 +184,7 @@ func (des DESCipher) RoundFunction(key, input, output []byte) {
 func (des DESCipher) RotateKey(key []byte, n int) {
   for i := 0; i < n; i++ {
     Bits(key).Rotate(key, 1)
-    Bits(key).Swap(27, 55)
+    Bits(key).Swap(28, 56)
   }
 }
 
