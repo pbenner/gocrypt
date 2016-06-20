@@ -223,7 +223,7 @@ func (cipher DESCipher) Encrypt(input, output []byte) error {
 
 func (cipher DESCipher) Decrypt(input, output []byte) error {
   if len(input) != cipher.BlockLength {
-    return  fmt.Errorf("DESCipher.Decrypt(): invalid input length")
+    return fmt.Errorf("DESCipher.Decrypt(): invalid input length")
   }
   if len(output) != cipher.BlockLength {
     return fmt.Errorf("DESCipher.Decrypt(): invalid output length")
