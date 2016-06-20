@@ -217,6 +217,24 @@ func (x Bits) Swap(i, j int) {
   }
 }
 
+func (x Bits) Inc() {
+  for i := 0; i < len(x); i++ {
+    x[i] += 1
+    if x[i] != 0 {
+      break
+    }
+  }
+}
+
+func (x Bits) Dec() {
+  for i := 0; i < len(x); i++ {
+    x[i] -= 1
+    if x[i] != 0xFF {
+      break
+    }
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 
 func reduceTableInjective(table [][]int, result []int) error {

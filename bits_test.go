@@ -73,6 +73,30 @@ func TestBitsSwap(t *testing.T) {
   }
 }
 
+func TestBitsInc(t *testing.T) {
+
+  bits1 := Bits{}.Read("11111111 00000001 01011000 11110001 11000001 01111000 00111001 01010011")
+  bits2 := Bits{}.Read("00000000 00000010 01011000 11110001 11000001 01111000 00111001 01010011")
+
+  bits1.Inc()
+
+  if !bits1.Equals(bits2) {
+    t.Error("incrementing bits failed")
+  }
+}
+
+func TestBitsDec(t *testing.T) {
+
+  bits1 := Bits{}.Read("00000000 00000010 01011000 11110001 11000001 01111000 00111001 01010011")
+  bits2 := Bits{}.Read("11111111 00000001 01011000 11110001 11000001 01111000 00111001 01010011")
+
+  bits1.Dec()
+
+  if !bits1.Equals(bits2) {
+    t.Error("decrementing bits failed")
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 
 func TestRotateSlice1(t *testing.T) {
