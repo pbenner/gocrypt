@@ -37,6 +37,12 @@ func NewFeistelNetwork(blockLength int, keys [][]byte, f RoundFunction) FeistelN
   return FeistelNetwork{blockLength, keys, f}
 }
 
+/* -------------------------------------------------------------------------- */
+
+func (network FeistelNetwork) GetBlockLength() int {
+  return network.BlockLength
+}
+
 func (network FeistelNetwork) eval(input, output []byte, getKey func(int) []byte) {
   l := network.BlockLength
   // allocate some memory for holding temporary data
@@ -70,10 +76,10 @@ func (network FeistelNetwork) eval(input, output []byte, getKey func(int) []byte
 
 func (network FeistelNetwork) Encrypt(input, output []byte) error {
   if len(input) != network.BlockLength {
-    fmt.Errorf("FeistelNetwork.Encrypt(): invalid input length")
+    return fmt.Errorf("FeistelNetwork.Encrypt(): invalid input length")
   }
   if len(output) != network.BlockLength {
-    fmt.Errorf("FeistelNetwork.Encrypt(): invalid output length")
+    return fmt.Errorf("FeistelNetwork.Encrypt(): invalid output length")
   }
   network.eval(input, output,
     func(i int) []byte {
@@ -84,10 +90,10 @@ func (network FeistelNetwork) Encrypt(input, output []byte) error {
 
 func (network FeistelNetwork) Decrypt(input, output []byte) error {
   if len(input) != network.BlockLength {
-    fmt.Errorf("FeistelNetwork.Decrypt(): invalid input length")
+    return fmt.Errorf("FeistelNetwork.Decrypt(): invalid input length")
   }
   if len(output) != network.BlockLength {
-    fmt.Errorf("FeistelNetwork.Decrypt(): invalid output length")
+    return fmt.Errorf("FeistelNetwork.Decrypt(): invalid output length")
   }
   network.eval(input, output,
     func(i int) []byte {

@@ -205,10 +205,10 @@ func NewDESCipher(key Key) (*DESCipher, error) {
 
 func (cipher DESCipher) Encrypt(input, output []byte) error {
   if len(input) != cipher.BlockLength {
-    fmt.Errorf("DESCipher.Encrypt(): invalid input length")
+    return fmt.Errorf("DESCipher.Encrypt(): invalid input length")
   }
   if len(output) != cipher.BlockLength {
-    fmt.Errorf("DESCipher.Encrypt(): invalid output length")
+    return fmt.Errorf("DESCipher.Encrypt(): invalid output length")
   }
   tmp := make([]byte, cipher.BlockLength)
   // apply initial permutation
@@ -223,10 +223,10 @@ func (cipher DESCipher) Encrypt(input, output []byte) error {
 
 func (cipher DESCipher) Decrypt(input, output []byte) error {
   if len(input) != cipher.BlockLength {
-    fmt.Errorf("DESCipher.Decrypt(): invalid input length")
+    return  fmt.Errorf("DESCipher.Decrypt(): invalid input length")
   }
   if len(output) != cipher.BlockLength {
-    fmt.Errorf("DESCipher.Decrypt(): invalid output length")
+    return fmt.Errorf("DESCipher.Decrypt(): invalid output length")
   }
   tmp := make([]byte, cipher.BlockLength)
   // apply initial permutation

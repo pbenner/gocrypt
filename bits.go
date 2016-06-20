@@ -74,6 +74,19 @@ func (bits Bits) String() string {
   return buffer.String()
 }
 
+func (bits Bits) Hex() string {
+
+  buffer := new(bytes.Buffer)
+  writer := bufio.NewWriter(buffer)
+
+  for i := 0; i < len(bits); i++ {
+    fmt.Fprintf(writer, "%02x", bits[i])
+  }
+  writer.Flush()
+
+  return buffer.String()
+}
+
 func (Bits) Read(str string) Bits {
   r := []byte{}
   // loop over string and convert each bit
