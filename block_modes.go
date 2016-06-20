@@ -19,6 +19,7 @@ package lib
 /* -------------------------------------------------------------------------- */
 
 import "fmt"
+import "math/rand"
 
 /* -------------------------------------------------------------------------- */
 
@@ -56,6 +57,54 @@ func (cipher ECBCipher) Decrypt(input, output []byte) error {
   }
   for i := 0; i < len(input)-bl+1; i += bl {
     cipher.BlockCipher.Decrypt(input[i:i+bl], output[i:i+bl])
+  }
+  return nil
+}
+
+/* -------------------------------------------------------------------------- */
+
+type CBCCipher struct {
+  BlockCipher
+}
+
+func NewCBCCipher(cipher BlockCipher) *CBCCipher {
+  return &CBCCipher{cipher}
+}
+
+func (cipher CBCCipher) Encrypt(input, output []byte) error {
+  bl := cipher.GetBlockLength()
+  // check arguments
+  if len(input) % bl != 0 {
+    return fmt.Errorf("CBCCipher.Encrypt(): invalid input length")
+  }
+  if len(input)+bl != len(output) {
+    return fmt.Errorf("CBCCipher.Encrypt(): invalid output length")
+  }
+  // the first part of the message contains the IV
+  iv := output[0:bl]
+  // draw a new IV
+  for i := 0; i < bl; i++ {
+    iv[i] = byte(rand.Int())
+  }
+  for i := 0; i < len(input); i += bl {
+    Bits(output[i+bl:i+2*bl]).Xor(output[i:i+bl], input[i:i+bl])
+    cipher.BlockCipher.Encrypt(output[i+bl:i+2*bl], output[i+bl:i+2*bl])
+  }
+  return nil
+}
+
+func (cipher CBCCipher) Decrypt(input, output []byte) error {
+  bl := cipher.GetBlockLength()
+  // check arguments
+  if len(input) % bl != 0 {
+    return fmt.Errorf("CBCCipher.Decrypt(): invalid input length")
+  }
+  if len(input)-bl != len(output) {
+    return fmt.Errorf("CBCCipher.Decrypt(): invalid output length")
+  }
+  for i := bl; i < len(input)-bl+1; i += bl {
+    cipher.BlockCipher.Decrypt(input[i:i+bl], output[i-bl:i])
+    Bits(output[i-bl:i]).Xor(output[i-bl:i], input[i-bl:i])
   }
   return nil
 }

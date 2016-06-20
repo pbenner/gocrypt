@@ -254,7 +254,7 @@ func TestMapInjective2(t *testing.T) {
     1,  2, 3,  4,  5,  6,  7,  8}
   input  := Bits{}.Read("10101010 00000000")
   output := Bits{}.Read("00000000 00000000")
-  result := Bits{}.Read("01010101 01010101")
+  result := Bits{}.Read("01010101 10101010")
 
   Bits(output).MapInjective(input, table)
 

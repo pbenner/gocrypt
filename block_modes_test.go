@@ -46,3 +46,27 @@ func TestECBCipher(t *testing.T) {
     t.Error("ECB encryption/decryption failed")
   }
 }
+
+func TestCBCCipher(t *testing.T) {
+
+	key    := []byte{0x3b, 0x38, 0x98, 0x37, 0x15, 0x20, 0xf7, 0x5e}
+  des, _ := NewDESCipher(key)
+  cbc    := NewCBCCipher(des)
+
+  plaintext := []byte("Gott wuerfelt nicht... !")
+  encrypted := make([]byte, len(plaintext) + des.GetBlockLength())
+  decrypted := make([]byte, len(plaintext))
+
+  err1 := cbc.Encrypt(plaintext, encrypted)
+  err2 := cbc.Decrypt(encrypted, decrypted)
+
+  if err1 != nil {
+    t.Error(err1)
+  }
+  if err2 != nil {
+    t.Error(err2)
+  }
+  if !Bits(plaintext).Equals(decrypted) {
+    t.Error("CBC encryption/decryption failed")
+  }
+}
