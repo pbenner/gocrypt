@@ -51,10 +51,10 @@ func TestCBCCipher(t *testing.T) {
 
 	key    := []byte{0x3b, 0x38, 0x98, 0x37, 0x15, 0x20, 0xf7, 0x5e}
   des, _ := NewDESCipher(key)
-  cbc    := NewCBCCipher(des)
+  cbc, _ := NewCBCCipher(des, []byte{1,2,3,4,5,6,7,8})
 
   plaintext := []byte("Gott wuerfelt nicht... !")
-  encrypted := make([]byte, len(plaintext) + des.GetBlockLength())
+  encrypted := make([]byte, len(plaintext))
   decrypted := make([]byte, len(plaintext))
 
   err1 := cbc.Encrypt(plaintext, encrypted)
