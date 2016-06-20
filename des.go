@@ -212,9 +212,9 @@ func (cipher DESCipher) Encrypt(input, output []byte) error {
   }
   tmp := make([]byte, cipher.BlockLength)
   // apply initial permutation
-  Bits(output).MapInjective(input, desIP)
+  Bits(tmp).MapInjective(input, desIP)
   // encrypt message
-  cipher.FeistelNetwork.Encrypt(output, tmp)
+  cipher.FeistelNetwork.Encrypt(tmp, tmp)
   Bits(output).Clear()
   // apply final permutation
   Bits(output).MapInjective(tmp, desFP)
@@ -230,9 +230,9 @@ func (cipher DESCipher) Decrypt(input, output []byte) error {
   }
   tmp := make([]byte, cipher.BlockLength)
   // apply initial permutation
-  Bits(output).MapInjective(input, desIP)
+  Bits(tmp).MapInjective(input, desIP)
   // encrypt message
-  cipher.FeistelNetwork.Decrypt(output, tmp)
+  cipher.FeistelNetwork.Decrypt(tmp, tmp)
   Bits(output).Clear()
   // apply final permutation
   Bits(output).MapInjective(tmp, desFP)

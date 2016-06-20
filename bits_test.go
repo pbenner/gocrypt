@@ -196,7 +196,7 @@ func TestMap(t *testing.T) {
   }
 }
 
-func TestMapInjective(t *testing.T) {
+func TestMapInjective1(t *testing.T) {
   table1 := [][]int{
     { 2, 48},
     { 3},
@@ -244,5 +244,21 @@ func TestMapInjective(t *testing.T) {
     if output1[i] != output2[i] {
       t.Error("bitmap test failed")
     }
+  }
+}
+
+func TestMapInjective2(t *testing.T) {
+
+  table := []int{
+    2,  3, 4,  5,  6,  7,  8,  1,
+    1,  2, 3,  4,  5,  6,  7,  8}
+  input  := Bits{}.Read("10101010 00000000")
+  output := Bits{}.Read("00000000 00000000")
+  result := Bits{}.Read("01010101 01010101")
+
+  Bits(output).MapInjective(input, table)
+
+  if !Bits(output).Equals(result) {
+      t.Error("injective bitmap test failed")
   }
 }

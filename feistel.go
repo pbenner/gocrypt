@@ -47,12 +47,13 @@ func (network FeistelNetwork) eval(input, output []byte, getKey func(int) []byte
   l := network.BlockLength
   // allocate some memory for holding temporary data
   iTmp := make([]byte, l)
+  oTmp := make([]byte, l)
   fTmp := make([]byte, l/2)
   // copy input
   copy(iTmp, input)
   // variables at the end of a round
-  Li := output[0:l/2]
-  Ri := output[l/2:l]
+  Li := oTmp[0:l/2]
+  Ri := oTmp[l/2:l]
   // let j = i+1
   Lj := iTmp[0:l/2]
   Rj := iTmp[l/2:l]

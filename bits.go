@@ -240,7 +240,8 @@ func reduceTableInjective(table [][]int, result []int) error {
 
 // Surjective mapping of input bits to output bits. The mapping
 // is defined by the table. The ith bit in the input slice is
-// mapped to position j = table[i] in the output.
+// mapped to position j = table[i] in the output. (Input and
+// output may NOT point to the same array!)
 func (output Bits) MapSurjective(input []byte, table []int) {
   // number of input bits
   n := 8*len(input)
@@ -260,7 +261,8 @@ func (output Bits) MapSurjective(input []byte, table []int) {
 
 // Injective mapping of input bits to output bits. The mapping
 // is defined by the table. The jth bit in the output slice is
-// copied from position i = table[j] in the input.
+// copied from position i = table[j] in the input. (Input and
+// output may NOT point to the same array.)
 func (output Bits) MapInjective(input []byte, table []int) {
   // number of input bits
   n := 8*len(output)
@@ -269,12 +271,18 @@ func (output Bits) MapInjective(input []byte, table []int) {
     panic("table has invalid length")
   }
   // loop over output bits
-  for j := 0; j < n; j++ {
-    // index of the input bit
-    i := table[j]-1
-    if input[i/8]  & byte(1 << byte(7 - (i % 8))) != 0 {
-      output[j/8] |= byte(1 << byte(7 - (j % 8)))
+  for k := 0; k < n; k += 8 {
+    // map values to a temporary variable first, this allows
+    // input and output to point to the same data
+    tmp := byte(0)
+    for j := k; j < k+8; j++ {
+      // index of the input bit
+      i := table[j]-1
+      if input[i/8]  & byte(1 << byte(7 - (i % 8))) != 0 {
+        tmp |= byte(1 << byte(7 - (j % 8)))
+      }
     }
+    output[k/8] = tmp
   }
 }
 
