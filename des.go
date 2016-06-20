@@ -18,7 +18,7 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
+import "fmt"
 
 /* -------------------------------------------------------------------------- */
 
@@ -190,48 +190,53 @@ func (des DESCipher) RotateKey(key []byte, n int) {
 
 /* -------------------------------------------------------------------------- */
 
-func NewDESCipher(key Key) DESCipher {
+func NewDESCipher(key Key) (*DESCipher, error) {
+  if len(key) != 8 {
+    return nil, fmt.Errorf("NewDESCipher(): invalid key length")
+  }
   cipher := DESCipher{}
   cipher.GenerateSubkeys(key)
   cipher.BlockLength = 64/8
   cipher.F           = cipher.RoundFunction
-  return cipher
+  return &cipher, nil
 }
 
 /* -------------------------------------------------------------------------- */
 
-func (cipher DESCipher) Encrypt(input []byte) []byte {
-  tmp1 := make([]byte, len(input))
-  bl   := cipher.BlockLength
+func (cipher DESCipher) Encrypt(input, output []byte) error {
+  if len(input) != cipher.BlockLength {
+    fmt.Errorf("DESCipher.Encrypt(): invalid input length")
+  }
+  if len(output) != cipher.BlockLength {
+    fmt.Errorf("DESCipher.Encrypt(): invalid output length")
+  }
+  tmp := make([]byte, cipher.BlockLength)
   // apply initial permutation
-  for i := 0; i < len(input); i += cipher.BlockLength {
-    Bits(tmp1[i:i+bl]).MapInjective(input[i:i+bl], desIP)
-  }
+  Bits(output).MapInjective(input, desIP)
   // encrypt message
-  tmp2 := cipher.FeistelNetwork.Encrypt(tmp1)
-  Bits(tmp1).Clear()
+  cipher.FeistelNetwork.Encrypt(output, tmp)
+  Bits(output).Clear()
   // apply final permutation
-  for i := 0; i < len(input); i += cipher.BlockLength {
-    Bits(tmp1[i:i+bl]).MapInjective(tmp2[i:i+bl], desFP)
-  }
-  return tmp1
+  Bits(output).MapInjective(tmp, desFP)
+  return nil
 }
 
-func (cipher DESCipher) Decrypt(input []byte) []byte {
-  tmp1 := make([]byte, len(input))
-  bl   := cipher.BlockLength
+func (cipher DESCipher) Decrypt(input, output []byte) error {
+  if len(input) != cipher.BlockLength {
+    fmt.Errorf("DESCipher.Decrypt(): invalid input length")
+  }
+  if len(output) != cipher.BlockLength {
+    fmt.Errorf("DESCipher.Decrypt(): invalid output length")
+  }
+  tmp := make([]byte, cipher.BlockLength)
   // apply initial permutation
-  for i := 0; i < len(input); i += cipher.BlockLength {
-    Bits(tmp1[i:i+bl]).MapInjective(input[i:i+bl], desIP)
-  }
+  Bits(output).MapInjective(input, desIP)
   // encrypt message
-  tmp2 := cipher.FeistelNetwork.Decrypt(tmp1)
-  Bits(tmp1).Clear()
+  cipher.FeistelNetwork.Decrypt(output, tmp)
+  Bits(output).Clear()
   // apply final permutation
-  for i := 0; i < len(input); i += cipher.BlockLength {
-    Bits(tmp1[i:i+bl]).MapInjective(tmp2[i:i+bl], desFP)
-  }
-  return tmp1
+  Bits(output).MapInjective(tmp, desFP)
+  return nil
 }
 
 func (cipher *DESCipher) GenerateSubkeys(key []byte) {

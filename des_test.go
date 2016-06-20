@@ -60,7 +60,7 @@ func TestDESkeys(t *testing.T) {
     Bits{}.Read("00111010 00010100 10011100 11110110 10000011 11110010"),
     Bits{}.Read("00010001 01111100 10000001 11010111 11100001 01001110")}
 
-  des := NewDESCipher(key)
+  des, _ := NewDESCipher(key)
 
   for i := 0; i < len(result); i++ {
     if !Bits(des.Keys[i]).Equals(result[i]) {
@@ -73,10 +73,14 @@ func TestDESencrypt(t *testing.T) {
   key := Key(Bits{}.Read("00111011 00111000 10011000 00110111 00010101 00100000 11110111 01011110"))
   // simply use the key as message
   msg := key
-  des := NewDESCipher(key)
 
-  encrypted := des.Encrypt(msg)
-  decrypted := des.Decrypt(encrypted)
+  des, _ := NewDESCipher(key)
+
+  encrypted := make([]byte, len(msg))
+  decrypted := make([]byte, len(msg))
+
+  des.Encrypt(msg, encrypted)
+  des.Decrypt(encrypted, decrypted)
 
   result := Bits{}.Read("10001111 00000011 01000101 01101101 00111111 01111000 11100010 11000101")
 
@@ -94,11 +98,12 @@ func TestDESgodes(t *testing.T) {
 	key2 := []byte{0x3b, 0x38, 0x98, 0x37, 0x15, 0x20, 0xf7, 0x5e}
 	plaintext := []byte("12345678")
 
-  des1    := NewDESCipher(key1)
+  des1, _ := NewDESCipher(key1)
 	des2, _ := des.NewCipher(key2)
 
-  ciphertext1 := des1.Encrypt(plaintext)
+	ciphertext1 := make([]byte, len(plaintext))
 	ciphertext2 := make([]byte, len(plaintext))
+  des1.Encrypt(plaintext, ciphertext1)
   des2.Encrypt(ciphertext2, plaintext)
 
   if !Bits(key1).Equals(key2) {

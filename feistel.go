@@ -18,7 +18,7 @@ package lib
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
+import "fmt"
 
 /* -------------------------------------------------------------------------- */
 
@@ -37,8 +37,11 @@ func NewFeistelNetwork(blockLength int, keys [][]byte, f RoundFunction) FeistelN
   return FeistelNetwork{blockLength, keys, f}
 }
 
-func (network FeistelNetwork) eval(input, output, iTmp, fTmp []byte, getKey func(int) []byte) {
+func (network FeistelNetwork) eval(input, output []byte, getKey func(int) []byte) {
   l := network.BlockLength
+  // allocate some memory for holding temporary data
+  iTmp := make([]byte, l)
+  fTmp := make([]byte, l/2)
   // copy input
   copy(iTmp, input)
   // variables at the end of a round
@@ -65,40 +68,30 @@ func (network FeistelNetwork) eval(input, output, iTmp, fTmp []byte, getKey func
   }
 }
 
-func (network FeistelNetwork) Encrypt(input []byte) []byte {
-  l := network.BlockLength
-  // allocate some memory for holding temporary data
-  iTmp := make([]byte, l)
-  fTmp := make([]byte, l/2)
-  // allocate memory for holding the output
-  output := make([]byte, len(input))
-  // loop over message and encrypt each block
-  for i := 0; i < len(input); i += l {
-    iBlock := input [i:i+l]
-    oBlock := output[i:i+l]
-    network.eval(iBlock, oBlock, iTmp, fTmp,
-      func(i int) []byte {
-        return network.Keys[i]
-      })
+func (network FeistelNetwork) Encrypt(input, output []byte) error {
+  if len(input) != network.BlockLength {
+    fmt.Errorf("FeistelNetwork.Encrypt(): invalid input length")
   }
-  return output
+  if len(output) != network.BlockLength {
+    fmt.Errorf("FeistelNetwork.Encrypt(): invalid output length")
+  }
+  network.eval(input, output,
+    func(i int) []byte {
+      return network.Keys[i]
+    })
+  return nil
 }
 
-func (network FeistelNetwork) Decrypt(input []byte) []byte {
-  l := network.BlockLength
-  // allocate some memory for holding temporary data
-  iTmp := make([]byte, l)
-  fTmp := make([]byte, l/2)
-  // allocate memory for holding the output
-  output := make([]byte, len(input))
-  // loop over message and encrypt each block
-  for i := 0; i < len(input); i += l {
-    iBlock := input [i:i+l]
-    oBlock := output[i:i+l]
-    network.eval(iBlock, oBlock, iTmp, fTmp,
-      func(i int) []byte {
-        return network.Keys[len(network.Keys)-i-1]
-      })
+func (network FeistelNetwork) Decrypt(input, output []byte) error {
+  if len(input) != network.BlockLength {
+    fmt.Errorf("FeistelNetwork.Decrypt(): invalid input length")
   }
-  return output
+  if len(output) != network.BlockLength {
+    fmt.Errorf("FeistelNetwork.Decrypt(): invalid output length")
+  }
+  network.eval(input, output,
+    func(i int) []byte {
+      return network.Keys[len(network.Keys)-i-1]
+    })
+  return nil
 }

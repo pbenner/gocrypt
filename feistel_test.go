@@ -38,7 +38,9 @@ func TestFeistel(t *testing.T) {
   network := NewFeistelNetwork(2, k, f)
 
   input  := []byte{13,3}
-  output := network.Encrypt(input)
+  output := []byte{ 0,0}
+
+  network.Encrypt(input, output)
 
   if output[1] != 3 {
     t.Error("bitmap test failed")
