@@ -112,5 +112,4 @@ func TestDESgodes(t *testing.T) {
   if !Bits(ciphertext1).Equals(ciphertext2) {
     t.Error("DES encryption failed")
   }
-
 }
