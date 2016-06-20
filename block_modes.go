@@ -119,3 +119,77 @@ func (cipher CBCCipher) Decrypt(input, output []byte) error {
   }
   return nil
 }
+
+/* -------------------------------------------------------------------------- */
+
+type CTRCipher struct {
+  BlockCipher
+  iv      []byte
+  counter []byte
+  buffer  []byte
+  position  int
+}
+
+func NewCTRCipher(cipher BlockCipher, iv []byte) (*CTRCipher, error) {
+  bl := cipher.GetBlockLength()
+  if len(iv) != bl {
+    return nil, fmt.Errorf("NewCTRCipher(): iv has invalid length")
+  }
+  result := CTRCipher{}
+  result.BlockCipher = cipher
+  result.iv          = make([]byte, bl)
+  result.counter     = make([]byte, bl)
+  result.buffer      = make([]byte, bl)
+  result.position    = 0
+  copy(result.iv, iv)
+  copy(result.counter, iv)
+  if err := result.fillBuffer(); err != nil {
+    return nil, err
+  }
+  return &result, nil
+}
+
+func (cipher *CTRCipher) fillBuffer() error {
+  err := cipher.BlockCipher.Encrypt(cipher.counter, cipher.buffer)
+  if err != nil {
+    return err
+  }
+  cipher.position = 0
+  Bits(cipher.counter).Inc()
+
+  return nil
+}
+
+func (cipher *CTRCipher) Reset() error {
+  copy(cipher.counter, cipher.iv)
+  return cipher.fillBuffer()
+}
+
+func (cipher *CTRCipher) SetIV(iv []byte) error {
+  bl := cipher.GetBlockLength()
+  if len(iv) != bl {
+    return fmt.Errorf("NewCTRCipher(): iv has invalid length")
+  }
+  copy(cipher.iv, iv)
+  copy(cipher.counter, iv)
+  return cipher.fillBuffer()
+}
+
+func (cipher *CTRCipher) Encrypt(input, output []byte) error {
+  for i := 0; i < len(input); i++ {
+    if cipher.position == len(cipher.buffer) {
+      // fill buffer again
+      if err := cipher.fillBuffer(); err != nil {
+        return err
+      }
+    }
+    Bits(output[i:i+1]).Xor(input[i:i+1], cipher.buffer[cipher.position:cipher.position+1])
+
+    cipher.position++
+  }
+  return nil
+}
+
+func (cipher *CTRCipher) Decrypt(input, output []byte) error {
+  return cipher.Encrypt(input, output)
+}
