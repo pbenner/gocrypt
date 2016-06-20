@@ -51,15 +51,19 @@ func (cipher TripleDESCipher) GetBlockLength() int {
 }
 
 func (cipher TripleDESCipher) Encrypt(input, output []byte) error {
-  cipher.cipher1.Encrypt(input,  output)
-  cipher.cipher2.Decrypt(output, output)
-  cipher.cipher3.Encrypt(output, output)
-  return nil
+  err := cipher.cipher1.Encrypt(input,  output)
+  if err != nil { return err }
+  err  = cipher.cipher2.Decrypt(output, output)
+  if err != nil { return err }
+  err  = cipher.cipher3.Encrypt(output, output)
+  return err
 }
 
 func (cipher TripleDESCipher) Decrypt(input, output []byte) error {
-  cipher.cipher3.Decrypt(input,  output)
-  cipher.cipher2.Encrypt(output, output)
-  cipher.cipher1.Decrypt(output, output)
-  return nil
+  err := cipher.cipher3.Decrypt(input,  output)
+  if err != nil { return err }
+  err  = cipher.cipher2.Encrypt(output, output)
+  if err != nil { return err }
+  err  = cipher.cipher1.Decrypt(output, output)
+  return err
 }
