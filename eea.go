@@ -51,8 +51,9 @@ func EEA(ri, rj *big.Int) (*big.Int, *big.Int, *big.Int) {
     tk.Mul(qj, tj)
     tk.Sub(ti, tk)
 
-    si.Set(sj); ti.Set(tj); ri.Set(rj)
-    sj.Set(sk); tj.Set(tk); rj.Set(rk)
+    si, sj, sk = sj, sk, si
+    ti, tj, tk = tj, tk, ti
+    ri, rj, rk = rj, rk, ri
   }
   // gcd(r0, r1) = ri = s r_0 + t r_1
   return ri, si, ti
