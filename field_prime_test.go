@@ -18,25 +18,18 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
-import "fmt"
+//import "fmt"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestPrimeField1(t *testing.T) {
+func TestPrimeField(t *testing.T) {
 
-  p := NewPrimeField(2)
+  p := NewPrimeField(29)
+  r := p.Div(1,17)
 
-  fmt.Println(p.Add(1,0))
-
-}
-
-func TestPrimeField2(t *testing.T) {
-
-  p := NewPrimeField(5)
-
-  for i := 1; i < 5; i++ {
-    fmt.Printf("1/%d: = %d\n", i, p.Div(1,i))
+  if r != 12 {
+    t.Error("prime field test failed")
   }
 
 }
