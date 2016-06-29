@@ -173,7 +173,9 @@ func TestPolynomial5(t *testing.T) {
   r2.AddTerm( 5, 0)
 
   r3 := NewPolynomial()
-  r4 := r3.Div(p, q)
+  r3.Div(p, q)
+  r4 := NewPolynomial()
+  r4.Mod(p, q)
 
   if !r3.Equals(r1) {
     t.Error("polynomial test failed")
@@ -181,7 +183,6 @@ func TestPolynomial5(t *testing.T) {
   if !r4.Equals(r2) {
     t.Error("polynomial test failed")
   }
-
 }
 
 func TestPolynomial6(t *testing.T) {

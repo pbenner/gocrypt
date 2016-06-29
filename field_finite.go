@@ -23,7 +23,42 @@ package gocrypt
 /* -------------------------------------------------------------------------- */
 
 type FiniteField struct {
-  P, N  int
+  P   PrimeField
+  N   int
+  IP *Polynomial
 }
 
 /* -------------------------------------------------------------------------- */
+
+func NewFiniteField(p, n int, ip *Polynomial) FiniteField {
+  return FiniteField{NewPrimeField(p), n, ip}
+}
+
+/* -------------------------------------------------------------------------- */
+
+func (f FiniteField) modp(r *Polynomial) *Polynomial {
+  for k, v := range r.Terms {
+    r.Terms[k] = float64(f.P.Modp(int(v)))
+  }
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+func (f FiniteField) Add(a, b *Polynomial) *Polynomial {
+  r := NewPolynomial()
+  r.Add(a, b)
+  return f.modp(r)
+}
+
+func (f FiniteField) Sub(a, b *Polynomial) *Polynomial {
+  r := NewPolynomial()
+  r.Sub(a, b)
+  return f.modp(r)
+}
+
+func (f FiniteField) Mul(a, b *Polynomial) *Polynomial {
+  r := NewPolynomial()
+  r.Sub(a, b)
+  return f.modp(r)
+}

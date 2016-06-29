@@ -195,7 +195,7 @@ func (r *Polynomial) Mul(a, b *Polynomial) {
 
 /* -------------------------------------------------------------------------- */
 
-func (s *Polynomial) Div(a, b *Polynomial) *Polynomial {
+func (r1 *Polynomial) div(a, b, r2 *Polynomial) {
   z := NewPolynomial()
   t := NewPolynomial()
   q := NewPolynomial()
@@ -212,16 +212,19 @@ func (s *Polynomial) Div(a, b *Polynomial) *Polynomial {
     t.Mul(t, b)
     r.Sub(r, t)
   }
-  s.Terms = q.Terms
-
-  return r
+  r1.Terms = q.Terms
+  // save remainder if s is given
+  if r2 != nil {
+    r2.Terms = r.Terms
+  }
 }
 
-/* -------------------------------------------------------------------------- */
+func (r *Polynomial) Div(a, b *Polynomial) {
+  r.div(a, b, nil)
+}
 
 func (r *Polynomial) Mod(a, b *Polynomial) {
-  s := r.Div(a, b)
-  r.Terms = s.Terms
+  r.div(a, b, r)
 }
 
 /* -------------------------------------------------------------------------- */
