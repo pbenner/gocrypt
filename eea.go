@@ -70,11 +70,13 @@ func PolynomialEEA(ri, rj *Polynomial) (*Polynomial, *Polynomial, *Polynomial) {
   si := NewPolynomial()
   si.AddTerm(1, 0)
   ti := NewPolynomial()
+  ri  = ri.Clone()
   // j = i+1
   sj := NewPolynomial()
   tj := NewPolynomial()
   tj.AddTerm(1, 0)
   qj := NewPolynomial()
+  rj  = rj.Clone()
   // k = j+1
   sk := NewPolynomial()
   tk := NewPolynomial()

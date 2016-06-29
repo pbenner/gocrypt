@@ -201,6 +201,7 @@ func (r1 *Polynomial) div(a, b, r2 *Polynomial) {
   q := NewPolynomial()
   r := a.Clone()
   if b.Equals(z) {
+    fmt.Println("b:",b)
     panic("Div(): division by zero")
   }
   c2, e2 := b.Lead()
@@ -236,6 +237,9 @@ func (r *Polynomial) String() string {
 
   keys := r.Exponents()
 
+  if len(keys) == 0 {
+    fmt.Fprintf(writer, "0.0")
+  }
   for i, k := range keys {
     v := r.Terms[k]
     if i != 0 {
@@ -249,7 +253,11 @@ func (r *Polynomial) String() string {
     if k == 0 {
       fmt.Fprintf(writer, "%f", v)
     } else {
-      fmt.Fprintf(writer, "%fx^%d", v, k)
+      if v == 1.0 {
+        fmt.Fprintf(writer, "x^%d", k)
+      } else {
+        fmt.Fprintf(writer, "%fx^%d", v, k)
+      }
     }
   }
   writer.Flush()

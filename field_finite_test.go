@@ -23,7 +23,7 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestFiniteField(t *testing.T) {
+func TestFiniteField1(t *testing.T) {
 
   // irreducible polynomial
   p := NewPolynomial()
@@ -50,4 +50,37 @@ func TestFiniteField(t *testing.T) {
     t.Error("finite field test failed")
   }
 
+}
+
+func TestFiniteField2(t *testing.T) {
+
+  // irreducible polynomial
+  p := NewPolynomial()
+  p.AddTerm(1, 8)
+  p.AddTerm(1, 4)
+  p.AddTerm(1, 3)
+  p.AddTerm(1, 1)
+  p.AddTerm(1, 0)
+
+  f := NewFiniteField(2, 16, p)
+
+  a := NewPolynomial()
+  a.AddTerm(1, 0)
+  b := NewPolynomial()
+  b.AddTerm(1, 7)
+  b.AddTerm(1, 6)
+  b.AddTerm(1, 1)
+
+  r1 := NewPolynomial()
+  r1.AddTerm(1, 5)
+  r1.AddTerm(1, 3)
+  r1.AddTerm(1, 2)
+  r1.AddTerm(1, 1)
+  r1.AddTerm(1, 0)
+
+  r2 := f.Div(a, b)
+
+  if !r1.Equals(r2) {
+    t.Error("finite field test failed")
+  }
 }
