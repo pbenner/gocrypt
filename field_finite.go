@@ -175,3 +175,24 @@ func (f FiniteField) EEA(ri, rj *Polynomial) (*Polynomial, *Polynomial, *Polynom
   // gcd(r0, r1) = ri = s r_0 + t r_1
   return ri, si, ti
 }
+
+/* -------------------------------------------------------------------------- */
+
+func (p *Polynomial) ReadByte(b byte) {
+  p.Clear()
+  for i := 0; i < 8; i ++ {
+    if b & (1 << byte(i)) != 0 {
+      p.AddTerm(1.0, i)
+    }
+  }
+}
+
+func (p *Polynomial) WriteByte() byte {
+  b := byte(0)
+  for k, _ := range p.Terms {
+    if k < 8 {
+      b |= (1 << byte(k))
+    }
+  }
+  return b
+}

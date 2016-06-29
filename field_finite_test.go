@@ -18,7 +18,7 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
+import "fmt"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
@@ -62,7 +62,7 @@ func TestFiniteField2(t *testing.T) {
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
 
-  f := NewFiniteField(2, 16, p)
+  f := NewFiniteField(2, 8, p)
 
   a := NewPolynomial()
   a.AddTerm(1, 0)
@@ -84,3 +84,60 @@ func TestFiniteField2(t *testing.T) {
     t.Error("finite field test failed")
   }
 }
+
+func TestFiniteField3(t *testing.T) {
+
+  // irreducible polynomial
+  p := NewPolynomial()
+  p.AddTerm(1, 8)
+  p.AddTerm(1, 4)
+  p.AddTerm(1, 3)
+  p.AddTerm(1, 1)
+  p.AddTerm(1, 0)
+
+  f := NewFiniteField(2, 8, p)
+
+  a := NewPolynomial()
+  a.AddTerm(1, 0)
+
+  for i := 0; i <= 0xFF; i++ {
+    b := NewPolynomial()
+    b.ReadByte(byte(i))
+
+    r := f.Div(a, b)
+
+    fmt.Printf("%02X -> %02X\n", i, r.WriteByte())
+
+  }
+
+}
+
+func TestFiniteField4(t *testing.T) {
+
+  // irreducible polynomial
+  p := NewPolynomial()
+  p.AddTerm(1, 8)
+  p.AddTerm(1, 4)
+  p.AddTerm(1, 3)
+  p.AddTerm(1, 1)
+  p.AddTerm(1, 0)
+
+  f := NewFiniteField(2, 8, p)
+
+  a := NewPolynomial()
+  a.AddTerm(1, 0)
+
+  str := []byte("alles klar?")
+
+  for i := 0; i < len(str); i++ {
+    b := NewPolynomial()
+    b.ReadByte(str[i])
+
+    r := f.Div(a, b)
+
+//    fmt.Printf("%02X", r.WriteByte())
+    fmt.Printf("%c", r.WriteByte())
+  }
+  fmt.Println()
+}
+
