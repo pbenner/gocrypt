@@ -48,17 +48,17 @@ func (f FiniteField) modp(r *Polynomial) *Polynomial {
  * of the prime field)
  * -------------------------------------------------------------------------- */
 
-func (r *Polynomial) netAddTerm(c float64, e int) {
-  r.AddTerm(c, e)
-  r.Clean()
-}
-
 func (r *Polynomial) netModCoeff(p PrimeField) *Polynomial {
   for k, v := range r.Terms {
     r.Terms[k] = float64(p.Modp(int(v)))
   }
   r.Clean()
   return r
+}
+
+func (r *Polynomial) netAddTerm(c float64, e int, p PrimeField) {
+  r.AddTerm(c, e)
+  r.netModCoeff(p)
 }
 
 func (r *Polynomial) netAdd(a, b *Polynomial, p PrimeField) {
@@ -88,8 +88,8 @@ func (r1 *Polynomial) netdiv(a, b, r2 *Polynomial, p PrimeField) {
   for !r.Equals(z) && r.Degree() >= b.Degree() {
     c1, e1 := r.Lead()
     t.Clear()
-    t.netAddTerm(float64(p.Div(int(c1), int(c2))), e1 - e2)
-    q.netAddTerm(float64(p.Div(int(c1), int(c2))), e1 - e2)
+    t.netAddTerm(float64(p.Div(int(c1), int(c2))), e1 - e2, p)
+    q.netAddTerm(float64(p.Div(int(c1), int(c2))), e1 - e2, p)
     t.netMul(t, b, p)
     r.netSub(r, t, p)
   }
