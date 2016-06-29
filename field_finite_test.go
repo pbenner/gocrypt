@@ -18,24 +18,24 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
+import "fmt"
 import "math"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestPolynomial1(t *testing.T) {
+func TestFiniteField1(t *testing.T) {
 
-  p := NewPolynomial()
+  p := NewFiniteField()
   p.AddTerm(20,30)
   p.AddTerm(2,3)
   q := p.Clone()
   q.AddTerm(1024, 256)
 
-  r := NewPolynomial()
+  r := NewFiniteField()
   r.Mul(p,q)
   // 20480x^286 + 2048x^259 + 400x^60 + 80x^33 + 4x^6
-  s := NewPolynomial()
+  s := NewFiniteField()
   s.AddTerm(20480, 286)
   s.AddTerm( 2048, 259)
   s.AddTerm(  400,  60)
@@ -48,17 +48,17 @@ func TestPolynomial1(t *testing.T) {
 
 }
 
-func TestPolynomial2(t *testing.T) {
+func TestFiniteField2(t *testing.T) {
 
-  p := NewPolynomial()
+  p := NewFiniteField()
   p.AddTerm(20, 30)
   p.AddTerm( 2  ,3)
   q := p.Clone()
 
-  r1 := NewPolynomial()
+  r1 := NewFiniteField()
   r1.Add(p, q)
 
-  r2 := NewPolynomial()
+  r2 := NewFiniteField()
   r2.Add(p, p)
 
   r3 := p.Clone()
@@ -85,15 +85,15 @@ func TestPolynomial2(t *testing.T) {
 
 }
 
-func TestPolynomial3(t *testing.T) {
+func TestFiniteField3(t *testing.T) {
 
-  p := NewPolynomial()
+  p := NewFiniteField()
   p.AddTerm(20, 30)
   p.AddTerm( 2  ,3)
   q := p.Clone()
   p.AddTerm(10, 35)
 
-  r1 := NewPolynomial()
+  r1 := NewFiniteField()
   r1.Sub(p, q)
 
   r2 := p.Clone()
@@ -111,23 +111,23 @@ func TestPolynomial3(t *testing.T) {
   if !r1.Equals(r3) {
     t.Error("polynomial test failed")
   }
-  if !r4.Equals(NewPolynomial()) {
+  if !r4.Equals(NewFiniteField()) {
     t.Error("polynomial test failed")
   }
 
 }
 
-func TestPolynomial4(t *testing.T) {
+func TestFiniteField4(t *testing.T) {
 
-  p := NewPolynomial()
+  p := NewFiniteField()
   p.AddTerm(20, 30)
   p.AddTerm( 2  ,3)
   q := p.Clone()
 
-  r1 := NewPolynomial()
+  r1 := NewFiniteField()
   r1.Mul(p, q)
 
-  r2 := NewPolynomial()
+  r2 := NewFiniteField()
   r2.Mul(p, p)
 
   r3 := p.Clone()
@@ -154,25 +154,25 @@ func TestPolynomial4(t *testing.T) {
 
 }
 
-func TestPolynomial5(t *testing.T) {
+func TestFiniteField5(t *testing.T) {
 
-  p := NewPolynomial()
+  p := NewFiniteField()
   p.AddTerm( 1, 3)
   p.AddTerm(-2, 2)
   p.AddTerm(-4, 0)
-  q := NewPolynomial()
+  q := NewFiniteField()
   q.AddTerm( 1, 1)
   q.AddTerm(-3, 0)
 
-  r1 := NewPolynomial()
+  r1 := NewFiniteField()
   r1.AddTerm( 1, 2)
   r1.AddTerm( 1, 1)
   r1.AddTerm( 3, 0)
 
-  r2 := NewPolynomial()
+  r2 := NewFiniteField()
   r2.AddTerm( 5, 0)
 
-  r3 := NewPolynomial()
+  r3 := NewFiniteField()
   r4 := r3.Div(p, q)
 
   if !r3.Equals(r1) {
@@ -184,15 +184,15 @@ func TestPolynomial5(t *testing.T) {
 
 }
 
-func TestPolynomial6(t *testing.T) {
+func TestFiniteField6(t *testing.T) {
 
-  p := NewPolynomial()
+  p := NewFiniteField()
   p.AddTerm( 1, 8)
   p.AddTerm( 1, 4)
   p.AddTerm( 1, 3)
   p.AddTerm( 1, 1)
   p.AddTerm( 1, 0)
-  a := NewPolynomial()
+  a := NewFiniteField()
   a.AddTerm( 1, 7)
   a.AddTerm( 1, 6)
   a.AddTerm( 1, 1)
@@ -208,5 +208,5 @@ func TestPolynomial6(t *testing.T) {
   if c, e := ti.Lead(); math.Abs(c - 0.796748) > 1e-4 || e != 6 {
     t.Error("polynomial test failed")
   }
-
+  fmt.Println(si)
 }

@@ -18,46 +18,25 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
-import "math/big"
+import "fmt"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestEEA(t *testing.T) {
+func TestPrimeField1(t *testing.T) {
 
-  r0 := 67
-  r1 := 12
+  p := NewPrimeField(2)
 
-  ri, si, ti := EEA(r0, r1)
-
-  if ri != 1 {
-      t.Error("EEA failed")
-  }
-  if si != -5 {
-      t.Error("EEA failed")
-  }
-  if ti != 28 {
-      t.Error("EEA failed")
-  }
+  fmt.Println(p.Add(1,0))
 
 }
 
-func TestBigEEA(t *testing.T) {
+func TestPrimeField2(t *testing.T) {
 
-  r0 := big.NewInt(67)
-  r1 := big.NewInt(12)
+  p := NewPrimeField(5)
 
-  ri, si, ti := BigEEA(r0, r1)
-
-  if ri.Cmp(big.NewInt(1)) != 0 {
-      t.Error("BigEEA failed")
-  }
-  if si.Cmp(big.NewInt(-5)) != 0 {
-      t.Error("BigEEA failed")
-  }
-  if ti.Cmp(big.NewInt(28)) != 0 {
-      t.Error("BigEEA failed")
+  for i := 1; i < 5; i++ {
+    fmt.Printf("1/%d: = %d\n", i, p.Div(1,i))
   }
 
 }

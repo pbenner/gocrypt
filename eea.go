@@ -23,9 +23,12 @@ import "math/big"
 
 /* -------------------------------------------------------------------------- */
 
-func EEA(ri, rj *big.Int) (*big.Int, *big.Int, *big.Int) {
+func BigEEA(ri, rj *big.Int) (*big.Int, *big.Int, *big.Int) {
 
-  zero := big.NewInt(0)
+  if ri.Cmp(rj) == -1 {
+    ri, rj = rj, ri
+  }
+  z0 := big.NewInt(0)
 
   si := big.NewInt(1)
   ti := big.NewInt(0)
@@ -38,7 +41,7 @@ func EEA(ri, rj *big.Int) (*big.Int, *big.Int, *big.Int) {
   tk := big.NewInt(0)
   rk := big.NewInt(0)
 
-  for rj.Cmp(zero) != 0 {
+  for rj.Cmp(z0) != 0 {
     // r_i = r_i-2 mod r_i-1
     rk.Mod(ri, rj)
     // q_i-1 = (r_i-2 - r_i)/r_i-1
@@ -50,6 +53,42 @@ func EEA(ri, rj *big.Int) (*big.Int, *big.Int, *big.Int) {
     // t_i = t_i-2 - q_i-1*t_i-1
     tk.Mul(qj, tj)
     tk.Sub(ti, tk)
+
+    si, sj, sk = sj, sk, si
+    ti, tj, tk = tj, tk, ti
+    ri, rj, rk = rj, rk, ri
+  }
+  // gcd(r0, r1) = ri = s r_0 + t r_1
+  return ri, si, ti
+}
+
+/* -------------------------------------------------------------------------- */
+
+func EEA(ri, rj int) (int, int, int) {
+
+  if ri < rj {
+    ri, rj = rj, ri
+  }
+  si := 1
+  ti := 0
+  // j = i+1
+  sj := 0
+  tj := 1
+  qj := 0
+  // k = j+1
+  sk := 0
+  tk := 0
+  rk := 0
+
+  for rj != 0 {
+    // r_i = r_i-2 mod r_i-1
+    rk = ri % rj
+    // q_i-1 = (r_i-2 - r_i)/r_i-1
+    qj = (ri - rk)/rj
+    // s_i = s_i-2 - q_i-1*s_i-1  
+    sk = si - qj * sj
+    // t_i = t_i-2 - q_i-1*t_i-1
+    tk = ti - qj * tj
 
     si, sj, sk = sj, sk, si
     ti, tj, tk = tj, tk, ti

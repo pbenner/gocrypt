@@ -19,45 +19,44 @@ package gocrypt
 /* -------------------------------------------------------------------------- */
 
 //import "fmt"
-import "math/big"
-import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestEEA(t *testing.T) {
+type PrimeField int
 
-  r0 := 67
-  r1 := 12
+/* -------------------------------------------------------------------------- */
 
-  ri, si, ti := EEA(r0, r1)
-
-  if ri != 1 {
-      t.Error("EEA failed")
-  }
-  if si != -5 {
-      t.Error("EEA failed")
-  }
-  if ti != 28 {
-      t.Error("EEA failed")
-  }
-
+func NewPrimeField(p int) PrimeField {
+  return PrimeField(p)
 }
 
-func TestBigEEA(t *testing.T) {
+/* -------------------------------------------------------------------------- */
 
-  r0 := big.NewInt(67)
-  r1 := big.NewInt(12)
+func (p PrimeField) Add(a, b int) int {
+  return p.Modp(a+b)
+}
 
-  ri, si, ti := BigEEA(r0, r1)
+func (p PrimeField) Sub(a, b int) int {
+  return p.Modp(a-b)
+}
 
-  if ri.Cmp(big.NewInt(1)) != 0 {
-      t.Error("BigEEA failed")
+func (p PrimeField) Mul(a, b int) int {
+  return p.Modp(a*b)
+}
+
+func (p PrimeField) Div(a, b int) int {
+  r, _, t := EEA(int(p), b)
+  if r != 1 {
+    panic("divisor does not have an inverse")
   }
-  if si.Cmp(big.NewInt(-5)) != 0 {
-      t.Error("BigEEA failed")
-  }
-  if ti.Cmp(big.NewInt(28)) != 0 {
-      t.Error("BigEEA failed")
-  }
+  return p.Mul(a, p.Modp(t))
+}
 
+func (p PrimeField) Modp(a int) int {
+  r := a % int(p)
+  if r < 0 {
+    return int(p) + r
+  } else {
+    return r
+  }
 }

@@ -21,41 +21,43 @@ package gocrypt
 import "fmt"
 import "bufio"
 import "bytes"
+import "math"
 import "sort"
 
 /* -------------------------------------------------------------------------- */
 
-type Polynomial struct {
+type FiniteField struct {
+  P, N  int
   Terms map[int]float64
 }
 
 /* -------------------------------------------------------------------------- */
 
-func NewPolynomial() *Polynomial {
+func NewFiniteField() *FiniteField {
   terms := make(map[int]float64)
-  return &Polynomial{terms}
+  return &FiniteField{0, 0, terms}
 }
 
 /* -------------------------------------------------------------------------- */
 
-func (r *Polynomial) Clone() *Polynomial {
-  s := NewPolynomial()
+func (r *FiniteField) Clone() *FiniteField {
+  s := NewFiniteField()
   for k, v := range r.Terms {
     s.Terms[k] = v
   }
   return s
 }
 
-func (r *Polynomial) AddTerm(c float64, e int) {
+func (r *FiniteField) AddTerm(c float64, e int) {
   r.Terms[e] += c
   r.Clean()
 }
 
-func (r *Polynomial) Clear() {
+func (r *FiniteField) Clear() {
   r.Terms = make(map[int]float64)
 }
 
-func (r *Polynomial) Exponents() []int {
+func (r *FiniteField) Exponents() []int {
   var keys []int
   for k := range r.Terms {
     keys = append(keys, k)
@@ -64,14 +66,14 @@ func (r *Polynomial) Exponents() []int {
   return keys
 }
 
-func (r *Polynomial) Degree() int {
+func (r *FiniteField) Degree() int {
   if len(r.Terms) == 0 {
     return 0
   }
   return r.Exponents()[0]
 }
 
-func (r *Polynomial) Lead() (float64, int) {
+func (r *FiniteField) Lead() (float64, int) {
   if len(r.Terms) == 0 {
     return 0, 0
   }
@@ -80,7 +82,10 @@ func (r *Polynomial) Lead() (float64, int) {
   return r.Terms[k], k
 }
 
-func (r *Polynomial) Clean() {
+func (r *FiniteField) Clean() {
+  for k, _ := range r.Terms {
+    r.Terms[k] = math.Abs(float64(int(r.Terms[k]) % 2))
+  }
   for k, v := range r.Terms {
     if v == 0 {
       delete(r.Terms, k)
@@ -90,7 +95,7 @@ func (r *Polynomial) Clean() {
 
 /* -------------------------------------------------------------------------- */
 
-func (r *Polynomial) Equals(a *Polynomial) bool {
+func (r *FiniteField) Equals(a *FiniteField) bool {
   if r == a {
     return true
   } else {
@@ -109,13 +114,13 @@ func (r *Polynomial) Equals(a *Polynomial) bool {
 
 /* -------------------------------------------------------------------------- */
 
-func (r *Polynomial) neg() {
+func (r *FiniteField) neg() {
   for k, v := range r.Terms {
     r.Terms[k] = -v
   }
 }
 
-func (r *Polynomial) Neg(a *Polynomial) {
+func (r *FiniteField) Neg(a *FiniteField) {
   if r == a {
     r.neg()
   } else {
@@ -127,14 +132,14 @@ func (r *Polynomial) Neg(a *Polynomial) {
 
 /* -------------------------------------------------------------------------- */
 
-func (r *Polynomial) add(a *Polynomial) {
+func (r *FiniteField) add(a *FiniteField) {
   for k, v := range a.Terms {
     r.Terms[k] += v
   }
   r.Clean()
 }
 
-func (r *Polynomial) Add(a, b *Polynomial) {
+func (r *FiniteField) Add(a, b *FiniteField) {
   if r == a {
     r.add(b)
   } else if r == b {
@@ -148,14 +153,14 @@ func (r *Polynomial) Add(a, b *Polynomial) {
 
 /* -------------------------------------------------------------------------- */
 
-func (r *Polynomial) sub(a *Polynomial) {
+func (r *FiniteField) sub(a *FiniteField) {
   for k, v := range a.Terms {
     r.Terms[k] -= v
   }
   r.Clean()
 }
 
-func (r *Polynomial) Sub(a, b *Polynomial) {
+func (r *FiniteField) Sub(a, b *FiniteField) {
   if r == a {
     r.sub(b)
   } else if r == b {
@@ -170,8 +175,8 @@ func (r *Polynomial) Sub(a, b *Polynomial) {
 
 /* -------------------------------------------------------------------------- */
 
-func (r *Polynomial) mul(a *Polynomial) {
-  t := NewPolynomial()
+func (r *FiniteField) mul(a *FiniteField) {
+  t := NewFiniteField()
   for k1, v1 := range r.Terms {
     for k2, v2 := range a.Terms {
       k := k1+k2
@@ -183,7 +188,7 @@ func (r *Polynomial) mul(a *Polynomial) {
   r.Clean()
 }
 
-func (r *Polynomial) Mul(a, b *Polynomial) {
+func (r *FiniteField) Mul(a, b *FiniteField) {
   if r == a || r == b {
     r.mul(b)
   } else {
@@ -195,10 +200,10 @@ func (r *Polynomial) Mul(a, b *Polynomial) {
 
 /* -------------------------------------------------------------------------- */
 
-func (s *Polynomial) Div(a, b *Polynomial) *Polynomial {
-  z := NewPolynomial()
-  t := NewPolynomial()
-  q := NewPolynomial()
+func (s *FiniteField) Div(a, b *FiniteField) *FiniteField {
+  z := NewFiniteField()
+  t := NewFiniteField()
+  q := NewFiniteField()
   r := a.Clone()
   if b.Equals(z) {
     panic("Div(): division by zero")
@@ -219,28 +224,28 @@ func (s *Polynomial) Div(a, b *Polynomial) *Polynomial {
 
 /* -------------------------------------------------------------------------- */
 
-func (r *Polynomial) Mod(a, b *Polynomial) {
+func (r *FiniteField) Mod(a, b *FiniteField) {
   s := r.Div(a, b)
   r.Terms = s.Terms
 }
 
 /* -------------------------------------------------------------------------- */
 
-func (ri *Polynomial) EEA(rj *Polynomial) (*Polynomial, *Polynomial, *Polynomial) {
+func (ri *FiniteField) EEA(rj *FiniteField) (*FiniteField, *FiniteField, *FiniteField) {
 
-  z0 := NewPolynomial()
-  si := NewPolynomial()
+  z0 := NewFiniteField()
+  si := NewFiniteField()
   si.AddTerm(1, 0)
-  ti := NewPolynomial()
+  ti := NewFiniteField()
   // j = i+1
-  sj := NewPolynomial()
-  tj := NewPolynomial()
+  sj := NewFiniteField()
+  tj := NewFiniteField()
   tj.AddTerm(1, 0)
-  qj := NewPolynomial()
+  qj := NewFiniteField()
   // k = j+1
-  sk := NewPolynomial()
-  tk := NewPolynomial()
-  rk := NewPolynomial()
+  sk := NewFiniteField()
+  tk := NewFiniteField()
+  rk := NewFiniteField()
 
   for !rj.Equals(z0) {
     // r_i = r_i-2 mod r_i-1
@@ -270,7 +275,7 @@ func (ri *Polynomial) EEA(rj *Polynomial) (*Polynomial, *Polynomial, *Polynomial
 
 /* -------------------------------------------------------------------------- */
 
-func (r *Polynomial) String() string {
+func (r *FiniteField) String() string {
 
   var buffer bytes.Buffer
   writer := bufio.NewWriter(&buffer)
