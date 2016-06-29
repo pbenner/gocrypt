@@ -40,6 +40,7 @@ func (f FiniteField) modp(r *Polynomial) *Polynomial {
   for k, v := range r.Terms {
     r.Terms[k] = float64(f.P.Modp(int(v)))
   }
+  r.Clean()
   return r
 }
 
@@ -59,6 +60,8 @@ func (f FiniteField) Sub(a, b *Polynomial) *Polynomial {
 
 func (f FiniteField) Mul(a, b *Polynomial) *Polynomial {
   r := NewPolynomial()
-  r.Sub(a, b)
-  return f.modp(r)
+  r.Mul(a, b)
+  f.modp(r)
+  r.Mod(r, f.IP)
+  return r
 }

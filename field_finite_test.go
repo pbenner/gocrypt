@@ -19,6 +19,35 @@ package gocrypt
 /* -------------------------------------------------------------------------- */
 
 //import "fmt"
-//import "testing"
+import "testing"
 
 /* -------------------------------------------------------------------------- */
+
+func TestFiniteField(t *testing.T) {
+
+  // irreducible polynomial
+  p := NewPolynomial()
+  p.AddTerm(1, 4)
+  p.AddTerm(1, 1)
+  p.AddTerm(1, 0)
+
+  f := NewFiniteField(2, 4, p)
+
+  a := NewPolynomial()
+  a.AddTerm(1, 3)
+  a.AddTerm(1, 2)
+  a.AddTerm(1, 0)
+  b := NewPolynomial()
+  b.AddTerm(1, 2)
+  b.AddTerm(1, 1)
+
+  r1 := NewPolynomial()
+  r1.AddTerm(1, 3)
+
+  r2 := f.Mul(a, b)
+
+  if !r1.Equals(r2) {
+    t.Error("finite field test failed")
+  }
+
+}
