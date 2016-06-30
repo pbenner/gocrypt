@@ -60,6 +60,27 @@ func (f FiniteField) FieldDiv(a_, b_ FieldElement) FieldElement {
   return f.Div(a, b)
 }
 
+func (f FiniteField) FieldIsZero(a_ FieldElement) bool {
+  a := a_.(*Polynomial)
+  return f.IsZero(a)
+}
+
+func (f FiniteField) FieldIsOne(a_ FieldElement) bool {
+  a := a_.(*Polynomial)
+  return f.IsOne(a)
+}
+
+func (f FiniteField) FieldZero() FieldElement {
+  r := NewPolynomial(f.P)
+  return r
+}
+
+func (f FiniteField) FieldOne() FieldElement {
+  r := NewPolynomial(f.P)
+  r.AddTerm(f.P.FieldOne(), 0)
+  return r
+}
+
 /* -------------------------------------------------------------------------- */
 
 func (f FiniteField) Add(a, b *Polynomial) *Polynomial {
@@ -86,6 +107,19 @@ func (f FiniteField) Div(a, b *Polynomial) *Polynomial {
   _, _, t := PolynomialEEA(f.IP, b)
   r.Mul(a, t)
   return r
+}
+
+func (f FiniteField) IsZero(a *Polynomial) bool {
+  return len(a.Terms) == 0
+}
+
+func (f FiniteField) IsOne(a *Polynomial) bool {
+  if len(a.Terms) == 1 {
+    if v, ok := a.Terms[0]; ok {
+      return f.P.FieldIsOne(v)
+    }
+  }
+  return false
 }
 
 /* -------------------------------------------------------------------------- */

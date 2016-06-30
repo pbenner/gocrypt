@@ -88,3 +88,29 @@ func TestFiniteField2(t *testing.T) {
     t.Error("finite field test failed")
   }
 }
+
+func TestFiniteField3(t *testing.T) {
+
+  pf := NewPrimeField(2)
+
+  // irreducible polynomial
+  p := NewPolynomial(pf)
+  p.AddTerm(1, 8)
+  p.AddTerm(1, 4)
+  p.AddTerm(1, 3)
+  p.AddTerm(1, 1)
+  p.AddTerm(1, 0)
+
+  f := NewFiniteField(2, 8, p)
+
+  zero := f.FieldZero()
+  one  := f.FieldOne()
+
+  if !f.FieldIsZero(zero) {
+    t.Error("finite field test failed")
+  }
+  if !f.FieldIsOne(one) {
+    t.Error("finite field test failed")
+  }
+
+}
