@@ -40,26 +40,26 @@ func NewByteMatrix(a []byte) ByteMatrix {
 
 /* -------------------------------------------------------------------------- */
 
-func ByteMmulV(a ByteMatrix, b ByteVector) byte {
+func ByteMmulV(a ByteMatrix, b ByteVector) ByteVector {
   r := byte(0.0)
   for i := 0; i < 8; i++ {
     s := byte(0)
     for j := 0; j < 8; j++ {
-      if a[i] & (1 << byte(j)) != 0 && b & (1 << byte(j)) != 0 {
+      if a[i] & (1 << byte(7-j)) != 0 && b & (1 << byte(j)) != 0 {
         s = (s + 1) % 2
       }
     }
-    r |= (s << byte(7-i))
+    r |= (s << byte(i))
   }
-  return r
+  return ByteVector(r)
 }
 
-func ByteVaddV(a ByteVector, b ByteVector) byte {
+func ByteVaddV(a ByteVector, b ByteVector) ByteVector {
   r := byte(0.0)
   for i := 0; i < 8; i++ {
-    if a & (1 << byte(i)) != 0 && b & (1 << byte(i)) != 0 {
-      r |= (1 << byte(7-i))
+    if (a^b) & (1 << byte(i)) != 0 {
+      r |= (1 << byte(i))
     }
   }
-  return r
+  return ByteVector(r)
 }

@@ -18,7 +18,7 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
-import "fmt"
+//import "fmt"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
@@ -87,6 +87,9 @@ func TestFiniteField2(t *testing.T) {
 
 func TestFiniteField3(t *testing.T) {
 
+  m := ByteMatrix(Bits{}.Read("10001111 11000111 11100011 11110001 11111000 01111100 00111110 00011111"))
+  v := ByteVector(Bits{}.Read("01100011")[0])
+
   // irreducible polynomial
   p := NewPolynomial()
   p.AddTerm(1, 8)
@@ -105,39 +108,10 @@ func TestFiniteField3(t *testing.T) {
     b.ReadByte(byte(i))
 
     r := f.Div(a, b)
+    y := ByteVaddV(ByteMmulV(m, ByteVector(r.WriteByte())), v)
 
-    fmt.Printf("%02X -> %02X\n", i, r.WriteByte())
-
+    if byte(y) != aesSbox[i] {
+      t.Error("finite field aes s-box test failed")
+    }
   }
-
 }
-
-func TestFiniteField4(t *testing.T) {
-
-  // irreducible polynomial
-  p := NewPolynomial()
-  p.AddTerm(1, 8)
-  p.AddTerm(1, 4)
-  p.AddTerm(1, 3)
-  p.AddTerm(1, 1)
-  p.AddTerm(1, 0)
-
-  f := NewFiniteField(2, 8, p)
-
-  a := NewPolynomial()
-  a.AddTerm(1, 0)
-
-  str := []byte("alles klar?")
-
-  for i := 0; i < len(str); i++ {
-    b := NewPolynomial()
-    b.ReadByte(str[i])
-
-    r := f.Div(a, b)
-
-//    fmt.Printf("%02X", r.WriteByte())
-    fmt.Printf("%c", r.WriteByte())
-  }
-  fmt.Println()
-}
-

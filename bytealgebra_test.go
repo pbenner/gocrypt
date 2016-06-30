@@ -25,14 +25,17 @@ import "testing"
 
 func TestByteAlgebra(t *testing.T) {
 
-  m := Bits{}.Read("10001111 11000111 11100011 11110001 11111000 01111100 00111110 00011111")
-  v := Bits{}.Read("11000111")[0]
-  r := Bits{}.Read("01010001")[0]
+  // y = m x + v
 
-  x := ByteMmulV(ByteMatrix(m), ByteVector(v))
+  m := ByteMatrix(Bits{}.Read("10001111 11000111 11100011 11110001 11111000 01111100 00111110 00011111"))
+  v := ByteVector(Bits{}.Read("01100011")[0])
 
-  if r != x {
+  x := ByteVector(Bits{}.Read("00101111")[0])
+  y := ByteVaddV(ByteMmulV(m, x), v)
+
+  r := ByteVector(Bits{}.Read("00100101")[0])
+
+  if y != r {
     t.Error("byte algebra test failed")
   }
-
 }
