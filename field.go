@@ -19,39 +19,19 @@ package gocrypt
 /* -------------------------------------------------------------------------- */
 
 //import "fmt"
-import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestAES1(t *testing.T) {
+type FieldElement interface{}
 
-  m := ByteMatrix(Bits{}.Read("10001111 11000111 11100011 11110001 11111000 01111100 00111110 00011111"))
-  v := ByteVector(Bits{}.Read("01100011")[0])
-
-  pf := NewPrimeField(2)
-
-  // irreducible polynomial
-  p := NewPolynomial(pf)
-  p.AddTerm(1, 8)
-  p.AddTerm(1, 4)
-  p.AddTerm(1, 3)
-  p.AddTerm(1, 1)
-  p.AddTerm(1, 0)
-
-  f := NewFiniteField(2, 8, p)
-
-  a := NewPolynomial(pf)
-  a.AddTerm(1, 0)
-
-  for i := 0; i <= 0xFF; i++ {
-    b := NewPolynomial(pf)
-    b.ReadByte(byte(i))
-
-    r := f.Div(a, b)
-    y := ByteVaddV(ByteMmulV(m, ByteVector(r.WriteByte())), v)
-
-    if byte(y) != aesSbox[i] {
-      t.Error("finite field aes s-box test failed")
-    }
-  }
+type Field interface {
+  FieldNeg(a    FieldElement) FieldElement
+  FieldAdd(a, b FieldElement) FieldElement
+  FieldSub(a, b FieldElement) FieldElement
+  FieldMul(a, b FieldElement) FieldElement
+  FieldDiv(a, b FieldElement) FieldElement
+  FieldIsZero(a FieldElement) bool
+  FieldIsOne (a FieldElement) bool
+  FieldZero() FieldElement
+  FieldOne () FieldElement
 }

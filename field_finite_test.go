@@ -25,23 +25,25 @@ import "testing"
 
 func TestFiniteField1(t *testing.T) {
 
+  pf := NewPrimeField(2)
+
   // irreducible polynomial
-  p := NewPolynomial()
+  p := NewPolynomial(pf)
   p.AddTerm(1, 4)
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
 
   f := NewFiniteField(2, 4, p)
 
-  a := NewPolynomial()
+  a := NewPolynomial(pf)
   a.AddTerm(1, 3)
   a.AddTerm(1, 2)
   a.AddTerm(1, 0)
-  b := NewPolynomial()
+  b := NewPolynomial(pf)
   b.AddTerm(1, 2)
   b.AddTerm(1, 1)
 
-  r1 := NewPolynomial()
+  r1 := NewPolynomial(pf)
   r1.AddTerm(1, 3)
 
   r2 := f.Mul(a, b)
@@ -54,8 +56,10 @@ func TestFiniteField1(t *testing.T) {
 
 func TestFiniteField2(t *testing.T) {
 
+  pf := NewPrimeField(2)
+
   // irreducible polynomial
-  p := NewPolynomial()
+  p := NewPolynomial(pf)
   p.AddTerm(1, 8)
   p.AddTerm(1, 4)
   p.AddTerm(1, 3)
@@ -64,14 +68,14 @@ func TestFiniteField2(t *testing.T) {
 
   f := NewFiniteField(2, 8, p)
 
-  a := NewPolynomial()
+  a := NewPolynomial(pf)
   a.AddTerm(1, 0)
-  b := NewPolynomial()
+  b := NewPolynomial(pf)
   b.AddTerm(1, 7)
   b.AddTerm(1, 6)
   b.AddTerm(1, 1)
 
-  r1 := NewPolynomial()
+  r1 := NewPolynomial(pf)
   r1.AddTerm(1, 5)
   r1.AddTerm(1, 3)
   r1.AddTerm(1, 2)

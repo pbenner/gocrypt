@@ -66,21 +66,21 @@ func BigEEA(ri, rj *big.Int) (*big.Int, *big.Int, *big.Int) {
 
 func PolynomialEEA(ri, rj *Polynomial) (*Polynomial, *Polynomial, *Polynomial) {
 
-  z0 := NewPolynomial()
-  si := NewPolynomial()
-  si.AddTerm(1, 0)
-  ti := NewPolynomial()
+  z0 := ri.CloneEmpty()
+  si := ri.CloneEmpty()
+  si.AddTerm(ri.Field.FieldOne(), 0)
+  ti := ri.CloneEmpty()
   ri  = ri.Clone()
   // j = i+1
-  sj := NewPolynomial()
-  tj := NewPolynomial()
-  tj.AddTerm(1, 0)
-  qj := NewPolynomial()
+  sj := ri.CloneEmpty()
+  tj := ri.CloneEmpty()
+  tj.AddTerm(ri.Field.FieldOne(), 0)
+  qj := ri.CloneEmpty()
   rj  = rj.Clone()
   // k = j+1
-  sk := NewPolynomial()
-  tk := NewPolynomial()
-  rk := NewPolynomial()
+  sk := ri.CloneEmpty()
+  tk := ri.CloneEmpty()
+  rk := ri.CloneEmpty()
 
   for !rj.Equals(z0) {
     // r_i = r_i-2 mod r_i-1

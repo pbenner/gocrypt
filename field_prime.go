@@ -32,6 +32,59 @@ func NewPrimeField(p int) PrimeField {
 
 /* -------------------------------------------------------------------------- */
 
+func (f PrimeField) FieldNeg(a_ FieldElement) FieldElement {
+  a := a_.(int)
+  return f.Neg(a)
+}
+
+func (f PrimeField) FieldAdd(a_, b_ FieldElement) FieldElement {
+  a := a_.(int)
+  b := b_.(int)
+  return f.Add(a, b)
+}
+
+func (f PrimeField) FieldSub(a_, b_ FieldElement) FieldElement {
+  a := a_.(int)
+  b := b_.(int)
+  return f.Sub(a, b)
+}
+
+func (f PrimeField) FieldMul(a_, b_ FieldElement) FieldElement {
+  a := a_.(int)
+  b := b_.(int)
+  return f.Mul(a, b)
+}
+
+func (f PrimeField) FieldDiv(a_, b_ FieldElement) FieldElement {
+  a := a_.(int)
+  b := b_.(int)
+  return f.Div(a, b)
+}
+
+func (f PrimeField) FieldIsZero(a_ FieldElement) bool {
+  a := a_.(int)
+  return f.IsZero(a)
+}
+
+func (f PrimeField) FieldIsOne(a_ FieldElement) bool {
+  a := a_.(int)
+  return f.IsOne(a)
+}
+
+func (f PrimeField) FieldZero() FieldElement {
+  return 0
+}
+
+func (f PrimeField) FieldOne() FieldElement {
+  return 1
+}
+
+/* -------------------------------------------------------------------------- */
+
+func (p PrimeField) Neg(a int) int {
+  return p.Modp(-a)
+}
+
 func (p PrimeField) Add(a, b int) int {
   return p.Modp(a+b)
 }
@@ -50,6 +103,14 @@ func (p PrimeField) Div(a, b int) int {
     panic("divisor does not have an inverse")
   }
   return p.Mul(a, p.Modp(t))
+}
+
+func (p PrimeField) IsZero(a int) bool {
+  return a == 0
+}
+
+func (p PrimeField) IsOne(a int) bool {
+  return a == 1
 }
 
 func (p PrimeField) Modp(a int) int {
