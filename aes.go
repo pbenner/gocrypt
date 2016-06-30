@@ -55,5 +55,14 @@ func (AESCipher) shiftRows(input, output []byte) {
 }
 
 func (AESCipher) mixColumn(input, output []byte) {
-  
+  add := func(a, b byte) byte {
+    return aesMixColAdd[a][b]
+  }
+  mul := func(a, b byte) byte {
+    return aesMixColMul[a][b]
+  }
+  output[0] = add(add(add(mul(2, input[0]), mul(3, input[1])), mul(1, input[2])), mul(1, input[3]))
+  output[1] = add(add(add(mul(1, input[0]), mul(2, input[1])), mul(3, input[2])), mul(1, input[3]))
+  output[2] = add(add(add(mul(1, input[0]), mul(1, input[1])), mul(2, input[2])), mul(3, input[3]))
+  output[3] = add(add(add(mul(3, input[0]), mul(1, input[1])), mul(1, input[2])), mul(2, input[3]))
 }
