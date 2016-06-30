@@ -22,6 +22,13 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
+type AESCipher struct {
+  BlockLength int // block length in bytes
+  Keys        [][]byte
+}
+
+/* -------------------------------------------------------------------------- */
+
 var aesSbox = []byte{
   0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
   0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
@@ -39,3 +46,34 @@ var aesSbox = []byte{
   0x70, 0x3E, 0xB5, 0x66, 0x48, 0x03, 0xF6, 0x0E, 0x61, 0x35, 0x57, 0xB9, 0x86, 0xC1, 0x1D, 0x9E,
   0xE1, 0xF8, 0x98, 0x11, 0x69, 0xD9, 0x8E, 0x94, 0x9B, 0x1E, 0x87, 0xE9, 0xCE, 0x55, 0x28, 0xDF,
   0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16 }
+
+/* -------------------------------------------------------------------------- */
+
+func (AESCipher) substitute(input, output []byte) {
+  for i := 0; i < len(input); i++ {
+    output[i] = aesSbox[input[i]]
+  }
+}
+
+func (AESCipher) shiftRows(input, output []byte) {
+  output[ 0] = input[ 0]
+  output[ 5] = input[ 1]
+  output[10] = input[ 2]
+  output[15] = input[ 3]
+  output[ 4] = input[ 4]
+  output[ 9] = input[ 5]
+  output[14] = input[ 6]
+  output[ 3] = input[ 7]
+  output[ 8] = input[ 8]
+  output[13] = input[ 9]
+  output[ 2] = input[10]
+  output[ 7] = input[11]
+  output[12] = input[12]
+  output[ 1] = input[13]
+  output[ 6] = input[14]
+  output[11] = input[15]
+}
+
+func (AESCipher) mixColumn(input, output []byte) {
+  
+}
