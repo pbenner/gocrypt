@@ -23,36 +23,10 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestFiniteField1(t *testing.T) {
+func TestAES1(t *testing.T) {
 
-  // irreducible polynomial
-  p := NewPolynomial()
-  p.AddTerm(1, 4)
-  p.AddTerm(1, 1)
-  p.AddTerm(1, 0)
-
-  f := NewFiniteField(2, 4, p)
-
-  a := NewPolynomial()
-  a.AddTerm(1, 3)
-  a.AddTerm(1, 2)
-  a.AddTerm(1, 0)
-  b := NewPolynomial()
-  b.AddTerm(1, 2)
-  b.AddTerm(1, 1)
-
-  r1 := NewPolynomial()
-  r1.AddTerm(1, 3)
-
-  r2 := f.Mul(a, b)
-
-  if !r1.Equals(r2) {
-    t.Error("finite field test failed")
-  }
-
-}
-
-func TestFiniteField2(t *testing.T) {
+  m := ByteMatrix(Bits{}.Read("10001111 11000111 11100011 11110001 11111000 01111100 00111110 00011111"))
+  v := ByteVector(Bits{}.Read("01100011")[0])
 
   // irreducible polynomial
   p := NewPolynomial()
@@ -66,21 +40,16 @@ func TestFiniteField2(t *testing.T) {
 
   a := NewPolynomial()
   a.AddTerm(1, 0)
-  b := NewPolynomial()
-  b.AddTerm(1, 7)
-  b.AddTerm(1, 6)
-  b.AddTerm(1, 1)
 
-  r1 := NewPolynomial()
-  r1.AddTerm(1, 5)
-  r1.AddTerm(1, 3)
-  r1.AddTerm(1, 2)
-  r1.AddTerm(1, 1)
-  r1.AddTerm(1, 0)
+  for i := 0; i <= 0xFF; i++ {
+    b := NewPolynomial()
+    b.ReadByte(byte(i))
 
-  r2 := f.Div(a, b)
+    r := f.Div(a, b)
+    y := ByteVaddV(ByteMmulV(m, ByteVector(r.WriteByte())), v)
 
-  if !r1.Equals(r2) {
-    t.Error("finite field test failed")
+    if byte(y) != aesSbox[i] {
+      t.Error("finite field aes s-box test failed")
+    }
   }
 }
