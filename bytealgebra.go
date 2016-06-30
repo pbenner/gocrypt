@@ -55,11 +55,5 @@ func ByteMmulV(a ByteMatrix, b ByteVector) ByteVector {
 }
 
 func ByteVaddV(a ByteVector, b ByteVector) ByteVector {
-  r := byte(0.0)
-  for i := 0; i < 8; i++ {
-    if (a^b) & (1 << byte(i)) != 0 {
-      r |= (1 << byte(i))
-    }
-  }
-  return ByteVector(r)
+  return a^b
 }
