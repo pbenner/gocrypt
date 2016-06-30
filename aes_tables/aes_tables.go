@@ -26,7 +26,7 @@ import . "github.com/pbenner/gocrypt"
 
 func printTable(name string, table [][]byte) {
 
-  fmt.Printf("var %s = [][]byte{\n", name)
+  fmt.Printf("var %s = [0x100][0x100]byte{\n", name)
 
   for i := 0; i < len(table); i++ {
     fmt.Printf("  { ")
