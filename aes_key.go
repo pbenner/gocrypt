@@ -44,3 +44,9 @@ func (cipher *AESCipher) subkeys128(key []byte) {
     Bits(cipher.Keys[i][12:16]).Xor(cipher.Keys[i-1][12:16], cipher.Keys[i-1][8:12])
   }
 }
+
+func (cipher *AESCipher) subkeys192(key []byte) {
+}
+
+func (cipher *AESCipher) subkeys256(key []byte) {
+}

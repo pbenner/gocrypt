@@ -18,7 +18,7 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
+import "fmt"
 
 /* -------------------------------------------------------------------------- */
 
@@ -63,4 +63,36 @@ func (AESCipher) mixColumn(input, output []byte) {
     output[i+2] = add[add[add[mul[1][input[i+0]]][mul[1][input[i+1]]]][mul[2][input[i+2]]]][mul[3][input[i+3]]]
     output[i+3] = add[add[add[mul[3][input[i+0]]][mul[1][input[i+1]]]][mul[1][input[i+2]]]][mul[2][input[i+3]]]
   }
+}
+
+/* -------------------------------------------------------------------------- */
+
+func NewAESCipher(key []byte) (*AESCipher, error) {
+  cipher := AESCipher{}
+  cipher.BlockLength = 16
+  if err := cipher.GenerateSubkeys(key); err != nil {
+    return nil, err
+  }
+  return &cipher, nil
+}
+
+/* -------------------------------------------------------------------------- */
+
+func (cipher AESCipher) Encrypt(input, output []byte) error {
+  return nil
+}
+
+func (cipher AESCipher) Decrypt(input, output []byte) error {
+  return nil
+}
+
+func (cipher *AESCipher) GenerateSubkeys(key []byte) error {
+  switch len(key) {
+  case 16: cipher.subkeys128(key)
+  case 24: cipher.subkeys192(key)
+  case 32: cipher.subkeys256(key)
+  default:
+    return fmt.Errorf("AESCipher.GenerateSubkeys(): invalid key length")
+  }
+  return nil
 }

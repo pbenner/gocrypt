@@ -191,13 +191,12 @@ func (des DESCipher) RotateKey(key []byte, n int) {
 /* -------------------------------------------------------------------------- */
 
 func NewDESCipher(key Key) (*DESCipher, error) {
-  if len(key) != 8 {
-    return nil, fmt.Errorf("NewDESCipher(): invalid key length")
-  }
   cipher := DESCipher{}
-  cipher.GenerateSubkeys(key)
   cipher.BlockLength = 64/8
   cipher.F           = cipher.RoundFunction
+  if err := cipher.GenerateSubkeys(key); err != nil {
+    return nil, err
+  }
   return &cipher, nil
 }
 
@@ -239,7 +238,10 @@ func (cipher DESCipher) Decrypt(input, output []byte) error {
   return nil
 }
 
-func (cipher *DESCipher) GenerateSubkeys(key []byte) {
+func (cipher *DESCipher) GenerateSubkeys(key []byte) error {
+  if len(key) != 8 {
+    return fmt.Errorf("DESCipher.GenerateSubkeys(): invalid key length")
+  }
   tmp := make([]byte, 56/8)
   cipher.Keys = make([][]byte, 16)
   // apply permutation choice 1
@@ -252,4 +254,5 @@ func (cipher *DESCipher) GenerateSubkeys(key []byte) {
     // apply permutation choice 2
     Bits(cipher.Keys[i]).MapInjective(tmp, desKeyPC2)
   }
+  return nil
 }
