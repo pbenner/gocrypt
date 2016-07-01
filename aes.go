@@ -88,9 +88,9 @@ func (cipher AESCipher) Decrypt(input, output []byte) error {
 
 func (cipher *AESCipher) GenerateSubkeys(key []byte) error {
   switch len(key) {
-  case 16: cipher.subkeys128(key)
-  case 24: cipher.subkeys192(key)
-  case 32: cipher.subkeys256(key)
+  case 16: cipher.subkeys(key, 10)
+  case 24: cipher.subkeys(key, 12)
+  case 32: cipher.subkeys(key, 14)
   default:
     return fmt.Errorf("AESCipher.GenerateSubkeys(): invalid key length")
   }

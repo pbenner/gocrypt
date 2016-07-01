@@ -66,5 +66,4 @@ func TestAES2(t *testing.T) {
   if !Bits(cipher.Keys[10]).Equals(r) {
     t.Error("aes keys test failed")
   }
-
 }

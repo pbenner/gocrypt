@@ -31,22 +31,27 @@ func (AESCipher) g(input, output []byte, i byte) {
 
 /* -------------------------------------------------------------------------- */
 
-func (cipher *AESCipher) subkeys128(key []byte) {
-  cipher.Keys    = make([][]byte, 11)
-  cipher.Keys[0] = make(  []byte, 16)
-  copy(cipher.Keys[0], key)
-  for i := 1; i < 11; i++ {
-    cipher.Keys[i] = make([]byte, 16)
-    cipher.g(cipher.Keys[i-1][12:16], cipher.Keys[i][12:16], byte(i))
-    Bits(cipher.Keys[i][ 0: 4]).Xor(cipher.Keys[i-1][ 0: 4], cipher.Keys[i][12:16])
-    Bits(cipher.Keys[i][ 4: 8]).Xor(cipher.Keys[i-1][ 4: 8], cipher.Keys[i][ 0: 4])
-    Bits(cipher.Keys[i][ 8:12]).Xor(cipher.Keys[i-1][ 8:12], cipher.Keys[i][ 4: 8])
-    Bits(cipher.Keys[i][12:16]).Xor(cipher.Keys[i-1][12:16], cipher.Keys[i][ 8:12])
+func (cipher *AESCipher) subkeys(key []byte, rounds int) {
+  subkeylen := cipher.BlockLength
+  if 4*len(key) % subkeylen != 0 {
+    panic("AESCipher.subkeys(): invalid key length")
   }
-}
-
-func (cipher *AESCipher) subkeys192(key []byte) {
-}
-
-func (cipher *AESCipher) subkeys256(key []byte) {
+  subkeys := make([]byte, (rounds+1)*subkeylen)
+  copy(subkeys[0:len(key)], key)
+  for m, i := 4*len(key)/subkeylen, 1; i <= rounds; i++ {
+    i0 := 4*m*(i-0)
+    i1 := 4*m*(i-1)
+    cipher.g(subkeys[i1+subkeylen-4:i1+subkeylen], subkeys[i0+subkeylen-4:i0+subkeylen], byte(i))
+    Bits(subkeys[i0:i0+1*4]).Xor(subkeys[i1:i1+1*4], subkeys[i0+subkeylen-4:i0+subkeylen])
+    for j := 1; j < m; j++ {
+      j0 := 4*(j-0)
+      j1 := 4*(j-1)
+      j2 := 4*(j+1)
+      Bits(subkeys[i0+j0:i0+j2]).Xor(subkeys[i1+j0:i1+j2], subkeys[i0+j1:i0+j0])
+    }
+  }
+  cipher.Keys = make([][]byte, rounds+1)
+  for i := 0; i < len(subkeys)/subkeylen; i++ {
+    cipher.Keys[i] = subkeys[i*subkeylen:(i+1)*subkeylen]
+  }
 }
