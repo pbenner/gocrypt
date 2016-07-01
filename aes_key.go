@@ -31,6 +31,16 @@ func (AESCipher) g(input, output []byte, i byte) {
 
 /* -------------------------------------------------------------------------- */
 
-func (cipher AESCipher) subkeys128(key []byte) {
-  
+func (cipher *AESCipher) subkeys128(key []byte) {
+  cipher.Keys    = make([][]byte, 11)
+  cipher.Keys[0] = make(  []byte, 16)
+  copy(cipher.Keys[0], key)
+  for i := 1; i < 11; i++ {
+    cipher.Keys[i] = make([]byte, 16)
+    cipher.g(cipher.Keys[i-1][12:16], cipher.Keys[i][0:4], byte(i))
+    Bits(cipher.Keys[i][ 0: 4]).Xor(cipher.Keys[i-1][ 0: 4], cipher.Keys[i  ][0: 4])
+    Bits(cipher.Keys[i][ 4: 8]).Xor(cipher.Keys[i-1][ 4: 8], cipher.Keys[i-1][0: 4])
+    Bits(cipher.Keys[i][ 8:12]).Xor(cipher.Keys[i-1][ 8:12], cipher.Keys[i-1][4: 8])
+    Bits(cipher.Keys[i][12:16]).Xor(cipher.Keys[i-1][12:16], cipher.Keys[i-1][8:12])
+  }
 }
