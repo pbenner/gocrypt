@@ -46,19 +46,20 @@ func (cipher *AESCipher) subkeys(key []byte, rounds int, h bool) {
   subkeys := make([]byte, (rounds+1)*subkeylen)
   copy(subkeys[0:len(key)], key)
   for m, i := 4*len(key)/subkeylen, 1; 4*m*i < len(subkeys); i++ {
-    i0 := 4*m*(i-0)
-    i1 := 4*m*(i-1)
-    cipher.g(subkeys[i0-4:i0], subkeys[i0:i0+4], byte(i))
-    Bits(subkeys[i0:i0+1*4]).Xor(subkeys[i1:i1+4], subkeys[i0:i0+4])
-    for j := 1; j < m && i0+4*(j+1) <= len(subkeys); j++ {
-      j0 := 4*(j-0)
-      j1 := 4*(j-1)
-      j2 := 4*(j+1)
+    input1 := subkeys[4*m*(i-0)-4:4*m*(i-0)]
+    input2 := subkeys[4*m*(i-1):4*m*(i-1)+4]
+    output := subkeys[4*m*(i-0):4*m*(i-0)+4]
+    cipher.g(input1, output, byte(i))
+    Bits(output).Xor(output, input2)
+    for j := 1; j < m && 4*m*(i-0)+4*(j+1) <= len(subkeys); j++ {
+      input1 := subkeys[4*m*(i-0)+4*(j-1):4*m*(i-0)+4*(j-0)]
+      input2 := subkeys[4*m*(i-1)+4*(j-0):4*m*(i-1)+4*(j+1)]
+      output := subkeys[4*m*(i-0)+4*(j-0):4*m*(i-0)+4*(j+1)]
       if h && j % (m/2) == 0 {
-        cipher.h(subkeys[i0+j1:i0+j0], subkeys[i0+j0:i0+j2])
-        Bits(subkeys[i0+j0:i0+j2]).Xor(subkeys[i0+j0:i0+j2], subkeys[i1+j0:i1+j2])
+        cipher.h(input1, output)
+        Bits(output).Xor(output, input2)
       } else {
-        Bits(subkeys[i0+j0:i0+j2]).Xor(subkeys[i1+j0:i1+j2], subkeys[i0+j1:i0+j0])
+        Bits(output).Xor(input1, input2)
       }
     }
   }
