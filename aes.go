@@ -79,6 +79,22 @@ func NewAESCipher(key []byte) (*AESCipher, error) {
 /* -------------------------------------------------------------------------- */
 
 func (cipher AESCipher) Encrypt(input, output []byte) error {
+  if len(input) != cipher.BlockLength {
+    return fmt.Errorf("AESCipher.Encrypt(): invalid input length")
+  }
+  if len(output) != cipher.BlockLength {
+    return fmt.Errorf("AESCipher.Encrypt(): invalid output length")
+  }
+  tmp := make([]byte, cipher.BlockLength)
+  // xor input
+  Bits(output).Xor(input, cipher.Keys[0])
+  // apply rounds
+  for i := 1; i < len(cipher.Keys); i++ {
+    cipher.substitute(output, tmp)
+    cipher.shiftRows (tmp, output)
+    cipher.mixColumn (output, tmp)
+    Bits(output).Xor(tmp, cipher.Keys[i])
+  }
   return nil
 }
 
