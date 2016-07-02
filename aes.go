@@ -37,21 +37,21 @@ func (AESCipher) substitute(input, output []byte) {
 
 func (AESCipher) shiftRows(input, output []byte) {
   output[ 0] = input[ 0]
-  output[ 5] = input[ 1]
+  output[13] = input[ 1]
   output[10] = input[ 2]
-  output[15] = input[ 3]
+  output[ 7] = input[ 3]
   output[ 4] = input[ 4]
-  output[ 9] = input[ 5]
+  output[ 1] = input[ 5]
   output[14] = input[ 6]
-  output[ 3] = input[ 7]
+  output[11] = input[ 7]
   output[ 8] = input[ 8]
-  output[13] = input[ 9]
+  output[ 5] = input[ 9]
   output[ 2] = input[10]
-  output[ 7] = input[11]
+  output[15] = input[11]
   output[12] = input[12]
-  output[ 1] = input[13]
+  output[ 9] = input[13]
   output[ 6] = input[14]
-  output[11] = input[15]
+  output[ 3] = input[15]
 }
 
 func (AESCipher) mixColumn(input, output []byte) {
@@ -92,8 +92,12 @@ func (cipher AESCipher) Encrypt(input, output []byte) error {
   for i := 1; i < len(cipher.Keys); i++ {
     cipher.substitute(output, tmp)
     cipher.shiftRows (tmp, output)
-    cipher.mixColumn (output, tmp)
-    Bits(output).Xor(tmp, cipher.Keys[i])
+    if i == len(cipher.Keys)-1 {
+      Bits(output).Xor(output, cipher.Keys[i])
+    } else {
+      cipher.mixColumn (output, tmp)
+      Bits(output).Xor(tmp, cipher.Keys[i])
+    }
   }
   return nil
 }
