@@ -25,8 +25,11 @@ import "math/rand"
 /* -------------------------------------------------------------------------- */
 
 func FermatTest(p *big.Int, s int, rnd *rand.Rand) bool {
-  if p.Sign() == -1 {
-    p.Mul(p, big.NewInt(-1))
+  // copy p to q
+  q := big.NewInt(0)
+  q.Set(p)
+  if q.Sign() == -1 {
+    q.Mul(q, big.NewInt(-1))
   }
   // some constants
   c1 := big.NewInt(1)
@@ -35,18 +38,17 @@ func FermatTest(p *big.Int, s int, rnd *rand.Rand) bool {
   c4 := big.NewInt(4)
   // variables for the test
   a := big.NewInt(0)
-  q := big.NewInt(0)
-  q.Set(p)
-  q.Sub(q, c1)
   n := big.NewInt(0)
-  n.Set(p)
+  n.Set(q)
   n.Sub(n, c4)
-  if p.Cmp(c2) == 0 || p.Cmp(c3) == 0 {
+  if q.Cmp(c2) == 0 || q.Cmp(c3) == 0 {
     return true
   }
   if n.Sign() <= 0 {
     return false
   }
+  // compute q = p-1
+  q.Sub(q, c1)
   for i := 0; i < s; i++ {
     a.Rand(rnd, n)
     a.Add(a, c2)

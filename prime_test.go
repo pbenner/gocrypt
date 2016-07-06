@@ -51,6 +51,13 @@ func TestFermatTest(t *testing.T) {
     t.Error("Fermat test failed")
   }
 
+  if _, ok := p.SetString("-2", 10); !ok {
+    panic("could not parse number")
+  }
+  if FermatTest(p, 100, r) != true {
+    t.Error("Fermat test failed")
+  }
+
   if _, ok := p.SetString("3", 10); !ok {
     panic("could not parse number")
   }
