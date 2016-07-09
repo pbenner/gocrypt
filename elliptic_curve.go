@@ -20,7 +20,6 @@ package gocrypt
 
 //import "fmt"
 import "math/big"
-//import "math/rand"
 
 /* -------------------------------------------------------------------------- */
 
@@ -64,7 +63,7 @@ func (ec EllipticCurve) Add(p, q ECPoint) ECPoint {
     // p == q
     s = f.Mul(p.x, p.x)
     s = f.Mul(s, big.NewInt(3))
-    s = f.Sub(s, ec.a)
+    s = f.Add(s, ec.a)
     s = f.Div(s, p.y)
     s = f.Div(s, big.NewInt(2))
   } else {

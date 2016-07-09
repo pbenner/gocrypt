@@ -24,7 +24,7 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestEllipticCurve(t *testing.T) {
+func TestEllipticCurve1(t *testing.T) {
 
   c := NewEllipticCurve(
     big.NewInt(1),
@@ -45,6 +45,28 @@ func TestEllipticCurve(t *testing.T) {
     t.Error("elliptic curve test failed")
   }
   if r.y.Cmp(big.NewInt(12)) != 0 {
+    t.Error("elliptic curve test failed")
+  }
+
+}
+
+func TestEllipticCurve2(t *testing.T) {
+
+  c := NewEllipticCurve(
+    big.NewInt(1),
+    big.NewInt(7),
+    big.NewInt(17))
+
+  p := NewECPoint(
+    big.NewInt(1),
+    big.NewInt(3))
+
+  r := c.Add(p, p)
+
+  if r.x.Cmp(big.NewInt(6)) != 0 {
+    t.Error("elliptic curve test failed")
+  }
+  if r.y.Cmp(big.NewInt(5)) != 0 {
     t.Error("elliptic curve test failed")
   }
 
