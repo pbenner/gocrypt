@@ -23,7 +23,12 @@ import "math/big"
 
 /* -------------------------------------------------------------------------- */
 
-func BigEEA(ri, rj *big.Int) (*big.Int, *big.Int, *big.Int) {
+func BigEEA(ri_, rj_ *big.Int) (*big.Int, *big.Int, *big.Int) {
+
+  ri := big.NewInt(0)
+  ri.Set(ri_)
+  rj := big.NewInt(0)
+  rj.Set(rj_)
 
   if ri.Cmp(rj) == -1 {
     ri, rj = rj, ri
