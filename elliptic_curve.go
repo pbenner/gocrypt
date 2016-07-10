@@ -41,6 +41,17 @@ func NullECPoint() ECPoint {
   return ECPoint{x, y}
 }
 
+func (p *ECPoint) Set(q ECPoint) {
+  if p.x == nil {
+    p.x = big.NewInt(0)
+  }
+  if p.y == nil {
+    p.y = big.NewInt(0)
+  }
+  p.x.Set(q.x)
+  p.y.Set(q.y)
+}
+
 func (p ECPoint) String() string {
   return fmt.Sprintf("(%v,%v)", p.x, p.y)
 }
