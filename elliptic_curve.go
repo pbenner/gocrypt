@@ -18,7 +18,7 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
+import "fmt"
 import "math/big"
 
 /* -------------------------------------------------------------------------- */
@@ -31,11 +31,18 @@ func NewECPoint(x, y *big.Int) ECPoint {
   return ECPoint{x, y}
 }
 
+func NilECPoint() ECPoint {
+  return ECPoint{nil, nil}
+}
 
 func NullECPoint() ECPoint {
   x := big.NewInt(0)
   y := big.NewInt(0)
   return ECPoint{x, y}
+}
+
+func (p ECPoint) String() string {
+  return fmt.Sprintf("(%v,%v)", p.x, p.y)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -55,11 +62,32 @@ func NewEllipticCurve(a, b, p *big.Int) EllipticCurve {
 /* -------------------------------------------------------------------------- */
 
 func (ec EllipticCurve) Add(p, q ECPoint) ECPoint {
+
   r := NullECPoint()
+
+  if ec.IsZero(p) && ec.IsZero(q) {
+    return ec.Zero()
+  }
+  if ec.IsZero(p) {
+    r.x = q.x
+    r.y = q.y
+    return r
+  }
+  if ec.IsZero(q) {
+    r.x = p.x
+    r.y = p.y
+    return r
+  }
+
   s := big.NewInt(0)
   t := big.NewInt(0)
   f := ec.f
   if p.x.Cmp(q.x) == 0 {
+    if p.y.Cmp(q.y) != 0 || p.y.Cmp(big.NewInt(0)) == 0 {
+      // p must be the inverse of q, i.e. either
+      // p.y != q.y or p.y == q.y == 0
+      return ec.Zero()
+    }
     // p == q
     s = f.Mul(p.x, p.x)
     s = f.Mul(s, big.NewInt(3))
@@ -80,4 +108,38 @@ func (ec EllipticCurve) Add(p, q ECPoint) ECPoint {
   r.y = f.Add(r.y, p.y)
   r.y = f.Neg(r.y)
   return r
+}
+
+func (ec EllipticCurve) Neg(p ECPoint) ECPoint {
+
+  r := NullECPoint()
+  r.x.Set(p.x)
+  r.y.Neg(p.y)
+
+  return r
+}
+
+func (ec EllipticCurve) MulInt(p ECPoint, n *big.Int) ECPoint {
+
+  r := NilECPoint()
+
+  for i := 0; i < n.BitLen(); i++ {
+    j := n.BitLen() - i - 1
+    r  = ec.Add(r, r)
+    if n.Bit(j) != 0 {
+      r = ec.Add(r, p)
+    }
+  }
+  return r
+}
+
+func (ec EllipticCurve) Zero() ECPoint {
+  return NilECPoint()
+}
+
+func (ec EllipticCurve) IsZero(p ECPoint) bool {
+  if p.x == nil || p.y == nil {
+    return true
+  }
+  return false
 }

@@ -71,3 +71,30 @@ func TestEllipticCurve2(t *testing.T) {
   }
 
 }
+
+func TestEllipticCurve3(t *testing.T) {
+
+  c := NewEllipticCurve(
+    big.NewInt(1),
+    big.NewInt(7),
+    big.NewInt(17))
+
+  p := NewECPoint(
+    big.NewInt(1),
+    big.NewInt(3))
+
+  r := c.Add(p, p)
+  for i := 0; i < 11; i++ {
+    r  = c.Add(r, p)
+  }
+
+  s := c.MulInt(p, big.NewInt(13))
+
+  if r.x.Cmp(s.x) != 0 {
+    t.Error("elliptic curve test failed")
+  }
+  if r.y.Cmp(s.y) != 0 {
+    t.Error("elliptic curve test failed")
+  }
+
+}
