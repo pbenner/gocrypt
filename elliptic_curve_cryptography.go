@@ -43,6 +43,21 @@ func NewECC(p, a, b, x_, y_, n_, h_ *big.Int) ECC {
   return ECC{curve, g, n, h}
 }
 
+func (ecc ECC) Base() ECPoint {
+  return ecc.G.Clone()
+}
+
+func (ecc ECC) Eval(r, a ECPoint, b *big.Int) ECPoint {
+  if a.x == nil {
+    t := ecc.Curve.MulInt(ecc.G, b)
+    r.Set(t)
+  } else {
+    t := ecc.Curve.MulInt(a, b)
+    r.Set(t)
+  }
+  return r
+}
+
 /* -------------------------------------------------------------------------- */
 
 var Secp521r1 ECC

@@ -65,12 +65,12 @@ func (k Key) Uint64Slice() []uint64 {
 /* i/o
  * -------------------------------------------------------------------------- */
 
-func (key *Key) Read(filename string) error {
+func (key *Key) Read(filename string) (Key, error) {
   var keystr string
 
   f, err := os.Open(filename)
   if err != nil {
-    return err
+    return nil, err
   }
   defer f.Close()
 
@@ -79,14 +79,9 @@ func (key *Key) Read(filename string) error {
   for scanner.Scan() {
     keystr = keystr + scanner.Text()
   }
-  tmp, err := base64.StdEncoding.DecodeString(string(keystr))
+  *key, err = Base64{}.ReadString(string(keystr))
 
-  if err != nil {
-    return err
-  }
-  *key = tmp
-
-  return nil
+  return *key, err
 }
 
 func (key Key) Write(filename string) error {
