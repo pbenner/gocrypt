@@ -29,7 +29,9 @@ type BigPrimeField struct {
 
 /* -------------------------------------------------------------------------- */
 
-func NewBigPrimeField(p *big.Int) BigPrimeField {
+func NewBigPrimeField(p_ *big.Int) BigPrimeField {
+  p := big.NewInt(0)
+  p.Set(p_)
   return BigPrimeField{p}
 }
 

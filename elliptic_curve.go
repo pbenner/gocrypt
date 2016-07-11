@@ -52,6 +52,13 @@ func (p *ECPoint) Set(q ECPoint) {
   p.y.Set(q.y)
 }
 
+func (p ECPoint) Clone() ECPoint {
+  q := NullECPoint()
+  q.x.Set(p.x)
+  q.y.Set(p.y)
+  return q
+}
+
 func (p ECPoint) String() string {
   return fmt.Sprintf("(%v,%v)", p.x, p.y)
 }
@@ -65,7 +72,11 @@ type EllipticCurve struct {
 
 /* -------------------------------------------------------------------------- */
 
-func NewEllipticCurve(a, b, p *big.Int) EllipticCurve {
+func NewEllipticCurve(a_, b_, p *big.Int) EllipticCurve {
+  a := big.NewInt(0)
+  a.Set(a_)
+  b := big.NewInt(0)
+  b.Set(b_)
   f := NewBigPrimeField(p)
   return EllipticCurve{a, b, f}
 }
