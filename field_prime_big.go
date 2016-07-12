@@ -37,34 +37,31 @@ func NewBigPrimeField(p_ *big.Int) BigPrimeField {
 
 /* -------------------------------------------------------------------------- */
 
-func (f BigPrimeField) Neg(a *big.Int) *big.Int {
-  return f.Modp(a.Neg(a))
+func (f BigPrimeField) Neg(r, a *big.Int) *big.Int {
+  return f.Modp(r, r.Neg(a))
 }
 
-func (f BigPrimeField) Add(a, b *big.Int) *big.Int {
-  r := big.NewInt(0)
+func (f BigPrimeField) Add(r, a, b *big.Int) *big.Int {
   r.Add(a, b)
-  return f.Modp(r)
+  return f.Modp(r, r)
 }
 
-func (f BigPrimeField) Sub(a, b *big.Int) *big.Int {
-  r := big.NewInt(0)
+func (f BigPrimeField) Sub(r, a, b *big.Int) *big.Int {
   r.Sub(a, b)
-  return f.Modp(r)
+  return f.Modp(r, r)
 }
 
-func (f BigPrimeField) Mul(a, b *big.Int) *big.Int {
-  r := big.NewInt(0)
+func (f BigPrimeField) Mul(r, a, b *big.Int) *big.Int {
   r.Mul(a, b)
-  return f.Modp(r)
+  return f.Modp(r, r)
 }
 
-func (f BigPrimeField) Div(a, b *big.Int) *big.Int {
-  r, _, t := BigEEA(f.p, b)
-  if r.Cmp(big.NewInt(1)) != 0 {
+func (f BigPrimeField) Div(r, a, b *big.Int) *big.Int {
+  s, _, t := BigEEA(f.p, b)
+  if s.Cmp(big.NewInt(1)) != 0 {
     panic("divisor does not have an inverse")
   }
-  return f.Mul(a, f.Modp(t))
+  return f.Mul(r, a, t)
 }
 
 func (f BigPrimeField) IsZero(a *big.Int) bool {
@@ -75,8 +72,8 @@ func (f BigPrimeField) IsOne(a *big.Int) bool {
   return a.Cmp(big.NewInt(1)) == 0
 }
 
-func (f BigPrimeField) Modp(a *big.Int) *big.Int {
-  r := a.Mod(a, f.p)
+func (f BigPrimeField) Modp(r, a *big.Int) *big.Int {
+  r.Mod(a, f.p)
   if r.Cmp(big.NewInt(0)) < 0 {
     r.Add(r, f.p)
   }

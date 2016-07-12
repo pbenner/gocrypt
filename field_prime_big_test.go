@@ -29,7 +29,9 @@ func TestBigPrimeField(t *testing.T) {
   p := NewBigPrimeField(big.NewInt(29))
   a := big.NewInt(1)
   b := big.NewInt(17)
-  r := p.Div(a, b)
+  r := big.NewInt(0)
+
+  p.Div(r, a, b)
 
   if r.Cmp(big.NewInt(12)) != 0 {
     t.Error("big prime field test failed")

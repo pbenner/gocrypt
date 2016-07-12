@@ -111,24 +111,24 @@ func (ec EllipticCurve) Add(p, q ECPoint) ECPoint {
       return ec.Zero()
     }
     // p == q
-    s = f.Mul(p.x, p.x)
-    s = f.Mul(s, big.NewInt(3))
-    s = f.Add(s, ec.a)
-    s = f.Div(s, p.y)
-    s = f.Div(s, big.NewInt(2))
+    f.Mul(s, p.x, p.x)
+    f.Mul(s, s, big.NewInt(3))
+    f.Add(s, s, ec.a)
+    f.Div(s, s, p.y)
+    f.Div(s, s, big.NewInt(2))
   } else {
     // p != q
-    s = f.Sub(p.y, q.y)
-    t = f.Sub(p.x, q.x)
-    s = f.Div(s, t)
+    f.Sub(s, p.y, q.y)
+    f.Sub(t, p.x, q.x)
+    f.Div(s, s, t)
   }
-  r.x = f.Mul(s, s)
-  r.x = f.Sub(r.x, p.x)
-  r.x = f.Sub(r.x, q.x)
-  r.y = f.Sub(r.x, p.x)
-  r.y = f.Mul(r.y, s)
-  r.y = f.Add(r.y, p.y)
-  r.y = f.Neg(r.y)
+  f.Mul(r.x, s, s)
+  f.Sub(r.x, r.x, p.x)
+  f.Sub(r.x, r.x, q.x)
+  f.Sub(r.y, r.x, p.x)
+  f.Mul(r.y, r.y, s)
+  f.Add(r.y, r.y, p.y)
+  f.Neg(r.y, r.y)
   return r
 }
 

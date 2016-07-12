@@ -47,15 +47,12 @@ func (ecc ECC) Base() ECPoint {
   return ecc.G.Clone()
 }
 
-func (ecc ECC) Eval(r, a ECPoint, b *big.Int) ECPoint {
+func (ecc ECC) Eval(a ECPoint, b *big.Int) ECPoint {
   if a.x == nil {
-    t := ecc.Curve.MulInt(ecc.G, b)
-    r.Set(t)
+    return ecc.Curve.MulInt(ecc.G, b)
   } else {
-    t := ecc.Curve.MulInt(a, b)
-    r.Set(t)
+    return ecc.Curve.MulInt(a, b)
   }
-  return r
 }
 
 /* -------------------------------------------------------------------------- */
