@@ -26,56 +26,50 @@ import "sort"
 /* -------------------------------------------------------------------------- */
 
 type Polynomial struct {
-  Terms map[int]FieldElement
-  Field Field
+  Terms  map[int]int
+  Field  FieldInt
 }
 
 /* -------------------------------------------------------------------------- */
 
-func NewPolynomial(field Field) *Polynomial {
-  terms := make(map[int]FieldElement)
-  return &Polynomial{terms, field}
-}
-
-func NewRealPolynomial() *Polynomial {
-  terms := make(map[int]FieldElement)
-  return &Polynomial{terms, NewRealField()}
+func NewPolynomial(field FieldInt) *Polynomial {
+  r := Polynomial{}
+  r.SetZero()
+  r.Field  = field
+  return &r
 }
 
 /* -------------------------------------------------------------------------- */
 
 func (r *Polynomial) Clone() *Polynomial {
   s := NewPolynomial(r.Field)
-  for k, v := range r.Terms {
-    s.Terms[k] = v
-  }
-  s.Field = r.Field
+  s.Set(r)
   return s
 }
 
-func (r *Polynomial) CloneEmpty() *Polynomial {
-  return NewPolynomial(r.Field)
-}
-
-func (r *Polynomial) AddTerm(c FieldElement, e int) {
+func (r *Polynomial) AddTerm(c, e int) {
+  if r.Field.IsZero(c) {
+    return
+  }
   if v, ok := r.Terms[e]; ok {
-    r.Terms[e] = r.Field.FieldAdd(v, c)
+    r.Terms[e] = r.Field.Add(v, c)
+    // if term has zero coefficient, delete it
+    if r.Field.IsZero(r.Terms[e]) {
+      delete(r.Terms, e)
+    }
   } else {
     r.Terms[e] = c
   }
-  r.Clean()
 }
 
-func (r *Polynomial) Clear() {
-  r.Terms = make(map[int]FieldElement)
-}
-
-func (r *Polynomial) Clean() {
-  for k, v := range r.Terms {
-    if r.Field.FieldIsZero(v) {
-      delete(r.Terms, k)
+func (r *Polynomial) Degree() int {
+  deg := 0
+  for k, _ := range r.Terms {
+    if k > deg {
+      deg = k
     }
   }
+  return deg
 }
 
 func (r *Polynomial) Exponents() []int {
@@ -87,20 +81,27 @@ func (r *Polynomial) Exponents() []int {
   return keys
 }
 
-func (r *Polynomial) Degree() int {
-  if len(r.Terms) == 0 {
-    return 0
-  }
-  return r.Exponents()[0]
-}
-
-func (r *Polynomial) Lead() (FieldElement, int) {
+func (r *Polynomial) Lead() (int, int) {
   if len(r.Terms) == 0 {
     return 0, 0
   }
-  k := r.Exponents()[0]
+  k := r.Degree()
 
   return r.Terms[k], k
+}
+
+/* -------------------------------------------------------------------------- */
+
+func (r *Polynomial) SetZero() {
+  r.Terms  = make(map[int]int)
+}
+
+func (r *Polynomial) Set(a *Polynomial) {
+  r.SetZero()
+  for k, v := range a.Terms {
+    r.Terms[k] = v
+  }
+  r.Field  = a.Field
 }
 
 /* -------------------------------------------------------------------------- */
@@ -126,31 +127,23 @@ func (r *Polynomial) Equals(a *Polynomial) bool {
 
 func (r *Polynomial) neg() {
   for k, v := range r.Terms {
-    r.Terms[k] = r.Field.FieldNeg(v)
+    r.Terms[k] = r.Field.Neg(v)
   }
 }
 
 func (r *Polynomial) Neg(a *Polynomial) {
-  if r == a {
-    r.neg()
-  } else {
-    r.Clear()
-    r.add(a)
-    r.neg()
+  if r != a {
+    r.Set(a)
   }
+  r.neg()
 }
 
 /* -------------------------------------------------------------------------- */
 
 func (r *Polynomial) add(a *Polynomial) {
   for k, v := range a.Terms {
-    if w, ok := r.Terms[k]; ok {
-      r.Terms[k] = r.Field.FieldAdd(w, v)
-    } else {
-      r.Terms[k] = v
-    }
+    r.AddTerm(v, k)
   }
-  r.Clean()
 }
 
 func (r *Polynomial) Add(a, b *Polynomial) {
@@ -159,7 +152,7 @@ func (r *Polynomial) Add(a, b *Polynomial) {
   } else if r == b {
     r.add(a)
   } else {
-    r.Clear()
+    r.SetZero()
     r.add(a)
     r.add(b)
   }
@@ -169,13 +162,8 @@ func (r *Polynomial) Add(a, b *Polynomial) {
 
 func (r *Polynomial) sub(a *Polynomial) {
   for k, v := range a.Terms {
-    if w, ok := r.Terms[k]; ok {
-      r.Terms[k] = r.Field.FieldSub(w, v)
-    } else {
-      r.Terms[k] = r.Field.FieldNeg(v)
-    }
+    r.AddTerm(r.Field.Neg(v), k)
   }
-  r.Clean()
 }
 
 func (r *Polynomial) Sub(a, b *Polynomial) {
@@ -185,7 +173,7 @@ func (r *Polynomial) Sub(a, b *Polynomial) {
     r.neg()
     r.add(a)
   } else {
-    r.Clear()
+    r.SetZero()
     r.add(a)
     r.sub(b)
   }
@@ -193,61 +181,63 @@ func (r *Polynomial) Sub(a, b *Polynomial) {
 
 /* -------------------------------------------------------------------------- */
 
-func (r *Polynomial) mul(a *Polynomial) {
-  t := NewPolynomial(r.Field)
-  for k1, v1 := range r.Terms {
-    for k2, v2 := range a.Terms {
+func (r *Polynomial) mul(a, b *Polynomial) {
+  for k1, v1 := range a.Terms {
+    for k2, v2 := range b.Terms {
       k := k1+k2
-      v := r.Field.FieldMul(v1, v2)
-      t.AddTerm(v, k)
+      v := r.Field.Mul(v1, v2)
+      r.AddTerm(v, k)
     }
   }
-  r.Terms = t.Terms
-  r.Clean()
 }
 
 func (r *Polynomial) Mul(a, b *Polynomial) {
   if r == a || r == b {
-    r.mul(b)
+    t := NewPolynomial(r.Field)
+    t.mul(a, b)
+    r.Set(t)
   } else {
-    r.Clear()
-    r.add(a)
-    r.mul(b)
+    r.SetZero()
+    r.mul(a, b)
   }
 }
 
 /* -------------------------------------------------------------------------- */
 
-func (r1 *Polynomial) div(a, b, r2 *Polynomial) {
-  z := NewPolynomial(r1.Field)
-  t := NewPolynomial(r1.Field)
-  q := NewPolynomial(r1.Field)
-  r := a.Clone()
+func (r *Polynomial) div(a, b *Polynomial, remainder bool) {
+  z := NewPolynomial(r.Field)
+  t := NewPolynomial(r.Field)
+  q := NewPolynomial(r.Field)
+  s := a.Clone()
   if b.Equals(z) {
     panic("Div(): division by zero")
   }
   c2, e2 := b.Lead()
-  for !r.Equals(z) && r.Degree() >= b.Degree() {
-    c1, e1 := r.Lead()
-    t.Clear()
-    t.AddTerm(r1.Field.FieldDiv(c1, c2), e1-e2)
-    q.AddTerm(r1.Field.FieldDiv(c1, c2), e1-e2)
+  for !s.Equals(z) && s.Degree() >= b.Degree() {
+    c1, e1 := s.Lead()
+    // new coefficient
+    c := s.Field.Div(c1, c2)
+    // new exponent
+    e := e1-e2
+    t.SetZero()
+    t.AddTerm(c, e)
+    q.AddTerm(c, e)
     t.Mul(t, b)
-    r.Sub(r, t)
+    s.Sub(s, t)
   }
-  r1.Terms = q.Terms
-  // save remainder if s is given
-  if r2 != nil {
-    r2.Terms = r.Terms
+  if remainder {
+    r.Set(s)
+  } else {
+    r.Set(q)
   }
 }
 
 func (r *Polynomial) Div(a, b *Polynomial) {
-  r.div(a, b, nil)
+  r.div(a, b, false)
 }
 
 func (r *Polynomial) Mod(a, b *Polynomial) {
-  r.div(a, b, r)
+  r.div(a, b, true)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -260,15 +250,10 @@ func (r *Polynomial) String() string {
   keys := r.Exponents()
 
   if len(keys) == 0 {
-    fmt.Fprintf(writer, "0.0")
+    fmt.Fprintf(writer, "0")
   }
   for i, k := range keys {
-    v := 0.0
-    switch x := r.Terms[k].(type) {
-    case float64: v = float64(x)
-    case int    : v = float64(x)
-    default: panic("String(): field not supported")
-    }
+    v := r.Terms[k]
     if i != 0 {
       if v >= 0.0 {
         fmt.Fprintf(writer, " + ")
@@ -278,12 +263,12 @@ func (r *Polynomial) String() string {
       }
     }
     if k == 0 {
-      fmt.Fprintf(writer, "%f", v)
+      fmt.Fprintf(writer, "%d", v)
     } else {
       if v == 1.0 {
         fmt.Fprintf(writer, "x^%d", k)
       } else {
-        fmt.Fprintf(writer, "%fx^%d", v, k)
+        fmt.Fprintf(writer, "%dx^%d", v, k)
       }
     }
   }

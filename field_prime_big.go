@@ -37,55 +37,6 @@ func NewBigPrimeField(p_ *big.Int) BigPrimeField {
 
 /* -------------------------------------------------------------------------- */
 
-func (f BigPrimeField) FieldNeg(a_ FieldElement) FieldElement {
-  a := a_.(*big.Int)
-  return f.Neg(a)
-}
-
-func (f BigPrimeField) FieldAdd(a_, b_ FieldElement) FieldElement {
-  a := a_.(*big.Int)
-  b := b_.(*big.Int)
-  return f.Add(a, b)
-}
-
-func (f BigPrimeField) FieldSub(a_, b_ FieldElement) FieldElement {
-  a := a_.(*big.Int)
-  b := b_.(*big.Int)
-  return f.Sub(a, b)
-}
-
-func (f BigPrimeField) FieldMul(a_, b_ FieldElement) FieldElement {
-  a := a_.(*big.Int)
-  b := b_.(*big.Int)
-  return f.Mul(a, b)
-}
-
-func (f BigPrimeField) FieldDiv(a_, b_ FieldElement) FieldElement {
-  a := a_.(*big.Int)
-  b := b_.(*big.Int)
-  return f.Div(a, b)
-}
-
-func (f BigPrimeField) FieldIsZero(a_ FieldElement) bool {
-  a := a_.(*big.Int)
-  return f.IsZero(a)
-}
-
-func (f BigPrimeField) FieldIsOne(a_ FieldElement) bool {
-  a := a_.(*big.Int)
-  return f.IsOne(a)
-}
-
-func (f BigPrimeField) FieldZero() FieldElement {
-  return 0
-}
-
-func (f BigPrimeField) FieldOne() FieldElement {
-  return 1
-}
-
-/* -------------------------------------------------------------------------- */
-
 func (f BigPrimeField) Neg(a *big.Int) *big.Int {
   return f.Modp(a.Neg(a))
 }

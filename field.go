@@ -22,16 +22,38 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
-type FieldElement interface{}
+type FieldInt interface {
+  Neg(a    int) int
+  Add(a, b int) int
+  Sub(a, b int) int
+  Mul(a, b int) int
+  Div(a, b int) int
+  IsZero(a int) bool
+  IsOne (a int) bool
+  Zero  () int
+  One   () int
+}
 
-type Field interface {
-  FieldNeg(a    FieldElement) FieldElement
-  FieldAdd(a, b FieldElement) FieldElement
-  FieldSub(a, b FieldElement) FieldElement
-  FieldMul(a, b FieldElement) FieldElement
-  FieldDiv(a, b FieldElement) FieldElement
-  FieldIsZero(a FieldElement) bool
-  FieldIsOne (a FieldElement) bool
-  FieldZero() FieldElement
-  FieldOne () FieldElement
+type FieldFloat interface {
+  Neg(a    float64) float64
+  Add(a, b float64) float64
+  Sub(a, b float64) float64
+  Mul(a, b float64) float64
+  Div(a, b float64) float64
+  IsZero(a float64) bool
+  IsOne (a float64) bool
+  Zero  () float64
+  One   () float64
+}
+
+type FieldPolynomial interface {
+  Neg(a    *Polynomial) *Polynomial
+  Add(a, b *Polynomial) *Polynomial
+  Sub(a, b *Polynomial) *Polynomial
+  Mul(a, b *Polynomial) *Polynomial
+  Div(a, b *Polynomial) *Polynomial
+  IsZero(a *Polynomial) bool
+  IsOne (a *Polynomial) bool
+  Zero  () *Polynomial
+  One   () *Polynomial
 }

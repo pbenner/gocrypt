@@ -34,49 +34,38 @@ func NewRealField() RealField {
 
 /* -------------------------------------------------------------------------- */
 
-func (f RealField) FieldNeg(a_ FieldElement) FieldElement {
-  a := a_.(float64)
+func (f RealField) Neg(a float64) float64 {
   return -a
 }
 
-func (f RealField) FieldAdd(a_, b_ FieldElement) FieldElement {
-  a := a_.(float64)
-  b := b_.(float64)
+func (f RealField) Add(a, b float64) float64 {
   return a+b
 }
 
-func (f RealField) FieldSub(a_, b_ FieldElement) FieldElement {
-  a := a_.(float64)
-  b := b_.(float64)
+func (f RealField) Sub(a, b float64) float64 {
   return a-b
 }
 
-func (f RealField) FieldMul(a_, b_ FieldElement) FieldElement {
-  a := a_.(float64)
-  b := b_.(float64)
+func (f RealField) Mul(a, b float64) float64 {
   return a*b
 }
 
-func (f RealField) FieldDiv(a_, b_ FieldElement) FieldElement {
-  a := a_.(float64)
-  b := b_.(float64)
+func (f RealField) Div(a, b float64) float64 {
   return a/b
 }
 
-func (f RealField) FieldIsZero(a_ FieldElement) bool {
-  a := a_.(float64)
+func (f RealField) IsZero(a float64) bool {
   return math.Abs(a) < 1e-12
 }
 
-func (f RealField) FieldIsOne(a_ FieldElement) bool {
-  a := a_.(float64)
+func (f RealField) IsOne(a float64) bool {
   return math.Abs(1.0-a) < 1e-12
 }
 
-func (f RealField) FieldZero() FieldElement {
+func (f RealField) Zero() float64 {
   return 0.0
 }
 
-func (f RealField) FieldOne() FieldElement {
+func (f RealField) One() float64 {
   return 1.0
 }

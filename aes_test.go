@@ -38,7 +38,7 @@ func TestAES1(t *testing.T) {
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
 
-  f := NewFiniteField(2, 8, p)
+  f := NewFiniteField(p)
 
   a := NewPolynomial(pf)
   a.AddTerm(1, 0)

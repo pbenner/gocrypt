@@ -33,7 +33,7 @@ func TestFiniteField1(t *testing.T) {
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
 
-  f := NewFiniteField(2, 4, p)
+  f := NewFiniteField(p)
 
   a := NewPolynomial(pf)
   a.AddTerm(1, 3)
@@ -51,7 +51,6 @@ func TestFiniteField1(t *testing.T) {
   if !r1.Equals(r2) {
     t.Error("finite field test failed")
   }
-
 }
 
 func TestFiniteField2(t *testing.T) {
@@ -66,7 +65,7 @@ func TestFiniteField2(t *testing.T) {
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
 
-  f := NewFiniteField(2, 8, p)
+  f := NewFiniteField(p)
 
   a := NewPolynomial(pf)
   a.AddTerm(1, 0)
@@ -101,15 +100,15 @@ func TestFiniteField3(t *testing.T) {
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
 
-  f := NewFiniteField(2, 8, p)
+  f := NewFiniteField(p)
 
-  zero := f.FieldZero()
-  one  := f.FieldOne()
+  zero := f.Zero()
+  one  := f.One()
 
-  if !f.FieldIsZero(zero) {
+  if !f.IsZero(zero) {
     t.Error("finite field test failed")
   }
-  if !f.FieldIsOne(one) {
+  if !f.IsOne(one) {
     t.Error("finite field test failed")
   }
 

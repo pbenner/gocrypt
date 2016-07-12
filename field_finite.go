@@ -23,89 +23,51 @@ package gocrypt
 /* -------------------------------------------------------------------------- */
 
 type FiniteField struct {
-  P   PrimeField
-  N   int
   IP *Polynomial
 }
 
 /* -------------------------------------------------------------------------- */
 
-func NewFiniteField(p, n int, ip *Polynomial) FiniteField {
-  return FiniteField{NewPrimeField(p), n, ip}
-}
-
-/* -------------------------------------------------------------------------- */
-
-func (f FiniteField) FieldAdd(a_, b_ FieldElement) FieldElement {
-  a := a_.(*Polynomial)
-  b := b_.(*Polynomial)
-  return f.Add(a, b)
-}
-
-func (f FiniteField) FieldSub(a_, b_ FieldElement) FieldElement {
-  a := a_.(*Polynomial)
-  b := b_.(*Polynomial)
-  return f.Sub(a, b)
-}
-
-func (f FiniteField) FieldMul(a_, b_ FieldElement) FieldElement {
-  a := a_.(*Polynomial)
-  b := b_.(*Polynomial)
-  return f.Mul(a, b)
-}
-
-func (f FiniteField) FieldDiv(a_, b_ FieldElement) FieldElement {
-  a := a_.(*Polynomial)
-  b := b_.(*Polynomial)
-  return f.Div(a, b)
-}
-
-func (f FiniteField) FieldIsZero(a_ FieldElement) bool {
-  a := a_.(*Polynomial)
-  return f.IsZero(a)
-}
-
-func (f FiniteField) FieldIsOne(a_ FieldElement) bool {
-  a := a_.(*Polynomial)
-  return f.IsOne(a)
-}
-
-func (f FiniteField) FieldZero() FieldElement {
-  r := NewPolynomial(f.P)
-  return r
-}
-
-func (f FiniteField) FieldOne() FieldElement {
-  r := NewPolynomial(f.P)
-  r.AddTerm(f.P.FieldOne(), 0)
-  return r
+func NewFiniteField(ip *Polynomial) FiniteField {
+  return FiniteField{ip}
 }
 
 /* -------------------------------------------------------------------------- */
 
 func (f FiniteField) Add(a, b *Polynomial) *Polynomial {
-  r := NewPolynomial(f.P)
+  r := NewPolynomial(f.IP.Field)
   r.Add(a, b)
   return r
 }
 
 func (f FiniteField) Sub(a, b *Polynomial) *Polynomial {
-  r := NewPolynomial(f.P)
+  r := NewPolynomial(f.IP.Field)
   r.Sub(a, b)
   return r
 }
 
 func (f FiniteField) Mul(a, b *Polynomial) *Polynomial {
-  r := NewPolynomial(f.P)
+  r := NewPolynomial(f.IP.Field)
   r.Mul(a, b)
   r.Mod(r, f.IP)
   return r
 }
 
 func (f FiniteField) Div(a, b *Polynomial) *Polynomial {
-  r := NewPolynomial(f.P)
+  r := NewPolynomial(f.IP.Field)
   _, _, t := PolynomialEEA(f.IP, b)
   r.Mul(a, t)
+  return r
+}
+
+func (f FiniteField) Zero() *Polynomial {
+  r := NewPolynomial(f.IP.Field)
+  return r
+}
+
+func (f FiniteField) One() *Polynomial {
+  r := NewPolynomial(f.IP.Field)
+  r.AddTerm(1, 0)
   return r
 }
 
@@ -116,7 +78,7 @@ func (f FiniteField) IsZero(a *Polynomial) bool {
 func (f FiniteField) IsOne(a *Polynomial) bool {
   if len(a.Terms) == 1 {
     if v, ok := a.Terms[0]; ok {
-      return f.P.FieldIsOne(v)
+      return f.IP.Field.IsOne(v)
     }
   }
   return false
@@ -125,10 +87,10 @@ func (f FiniteField) IsOne(a *Polynomial) bool {
 /* -------------------------------------------------------------------------- */
 
 func (p *Polynomial) ReadByte(b byte) {
-  p.Clear()
+  p.SetZero()
   for i := 0; i < 8; i ++ {
     if b & (1 << byte(i)) != 0 {
-      p.AddTerm(p.Field.FieldOne(), i)
+      p.AddTerm(p.Field.One(), i)
     }
   }
 }
