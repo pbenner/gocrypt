@@ -75,6 +75,9 @@ func init() {
   n := big.NewInt(0)
   h := big.NewInt(0)
 
+  // http://www.secg.org/sec1-v2.pdf
+  // http://www.secg.org/sec2-v2.pdf
+
   // secp192k1
   p.SetString("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFEE37", 0)
   a.SetString("0x000000000000000000000000000000000000000000000000", 0)
