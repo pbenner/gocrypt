@@ -110,13 +110,13 @@ func TestEllipticCurve4(t *testing.T) {
     big.NewInt(5),
     big.NewInt(1))
 
-  r := NilECPoint()
+  r := NullECPoint()
   r.Set(p)
   for i := 0; i < 18; i++ {
     r  = c.Add(r, p)
   }
 
-  if !c.IsZero(r) {
+  if !r.IsZero() {
     t.Error("elliptic curve test failed")
   }
 

@@ -18,50 +18,8 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
-import "fmt"
+//import "fmt"
 import "math/big"
-
-/* -------------------------------------------------------------------------- */
-
-type ECPoint struct {
-  x, y *big.Int
-}
-
-func NewECPoint(x, y *big.Int) ECPoint {
-  return ECPoint{x, y}
-}
-
-func NilECPoint() ECPoint {
-  return ECPoint{nil, nil}
-}
-
-func NullECPoint() ECPoint {
-  x := big.NewInt(0)
-  y := big.NewInt(0)
-  return ECPoint{x, y}
-}
-
-func (p *ECPoint) Set(q ECPoint) {
-  if p.x == nil {
-    p.x = big.NewInt(0)
-  }
-  if p.y == nil {
-    p.y = big.NewInt(0)
-  }
-  p.x.Set(q.x)
-  p.y.Set(q.y)
-}
-
-func (p ECPoint) Clone() ECPoint {
-  q := NullECPoint()
-  q.x.Set(p.x)
-  q.y.Set(p.y)
-  return q
-}
-
-func (p ECPoint) String() string {
-  return fmt.Sprintf("(%v,%v)", p.x, p.y)
-}
 
 /* -------------------------------------------------------------------------- */
 
@@ -87,15 +45,17 @@ func (ec EllipticCurve) Add(p, q ECPoint) ECPoint {
 
   r := NullECPoint()
 
-  if ec.IsZero(p) && ec.IsZero(q) {
-    return ec.Zero()
+  if p.IsZero() && q.IsZero() {
+    return r
   }
-  if ec.IsZero(p) {
+  if p.IsZero() {
+    r.SetZero(false)
     r.x = q.x
     r.y = q.y
     return r
   }
-  if ec.IsZero(q) {
+  if q.IsZero() {
+    r.SetZero(false)
     r.x = p.x
     r.y = p.y
     return r
@@ -108,7 +68,7 @@ func (ec EllipticCurve) Add(p, q ECPoint) ECPoint {
     if p.y.Cmp(q.y) != 0 || p.y.Cmp(big.NewInt(0)) == 0 {
       // p must be the inverse of q, i.e. either
       // p.y != q.y or p.y == q.y == 0
-      return ec.Zero()
+      return r
     }
     // p == q
     f.Mul(s, p.x, p.x)
@@ -129,21 +89,21 @@ func (ec EllipticCurve) Add(p, q ECPoint) ECPoint {
   f.Mul(r.y, r.y, s)
   f.Add(r.y, r.y, p.y)
   f.Neg(r.y, r.y)
+  r.SetZero(false)
   return r
 }
 
 func (ec EllipticCurve) Neg(p ECPoint) ECPoint {
 
-  r := NullECPoint()
-  r.x.Set(p.x)
-  r.y.Neg(p.y)
+  r := NewECPoint(p.x, p.y)
+  r.y.Neg(r.y)
 
   return r
 }
 
 func (ec EllipticCurve) MulInt(p ECPoint, n *big.Int) ECPoint {
 
-  r := NilECPoint()
+  r := NewECPoint(nil, nil)
 
   for i := 0; i < n.BitLen(); i++ {
     j := n.BitLen() - i - 1
@@ -153,15 +113,4 @@ func (ec EllipticCurve) MulInt(p ECPoint, n *big.Int) ECPoint {
     }
   }
   return r
-}
-
-func (ec EllipticCurve) Zero() ECPoint {
-  return NilECPoint()
-}
-
-func (ec EllipticCurve) IsZero(p ECPoint) bool {
-  if p.x == nil || p.y == nil {
-    return true
-  }
-  return false
 }

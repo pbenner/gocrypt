@@ -48,7 +48,7 @@ func (ecc ECC) Base() ECPoint {
 }
 
 func (ecc ECC) Eval(a ECPoint, b *big.Int) ECPoint {
-  if a.x == nil {
+  if a.IsZero() {
     return ecc.Curve.MulInt(ecc.G, b)
   } else {
     return ecc.Curve.MulInt(a, b)
