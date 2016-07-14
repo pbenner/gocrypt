@@ -23,14 +23,14 @@ import "math/big"
 
 /* -------------------------------------------------------------------------- */
 
-type ECPoint struct {
+type AffinePoint struct {
   x, y *big.Int
   isZero bool
 }
 
 /* -------------------------------------------------------------------------- */
 
-func NewECPoint(x_, y_ *big.Int) ECPoint {
+func NewAffinePoint(x_, y_ *big.Int) AffinePoint {
   x := big.NewInt(0)
   y := big.NewInt(0)
   if x_ != nil {
@@ -39,37 +39,37 @@ func NewECPoint(x_, y_ *big.Int) ECPoint {
   if y_ != nil {
     y.Set(y_)
   }
-  return ECPoint{x, y, false}
+  return AffinePoint{x, y, false}
 }
 
-func NullECPoint() ECPoint {
+func NullAffinePoint() AffinePoint {
   x := big.NewInt(0)
   y := big.NewInt(0)
-  return ECPoint{x, y, true}
+  return AffinePoint{x, y, true}
 }
 
 /* -------------------------------------------------------------------------- */
 
-func (p ECPoint) Clone() ECPoint {
-  q := NullECPoint()
+func (p AffinePoint) Clone() AffinePoint {
+  q := NullAffinePoint()
   q.x.Set(p.x)
   q.y.Set(p.y)
   return q
 }
 
-func (p ECPoint) IsZero() bool {
+func (p AffinePoint) IsZero() bool {
   return p.isZero
 }
 
-func (p ECPoint) GetX() *big.Int {
+func (p AffinePoint) GetX() *big.Int {
   return p.x
 }
 
-func (p ECPoint) GetY() *big.Int {
+func (p AffinePoint) GetY() *big.Int {
   return p.y
 }
 
-func (p *ECPoint) Set(q ECPoint) {
+func (p *AffinePoint) Set(q AffinePoint) {
   p.isZero = q.isZero
   if !p.isZero {
     p.x.Set(q.x)
@@ -77,22 +77,111 @@ func (p *ECPoint) Set(q ECPoint) {
   }
 }
 
-func (p *ECPoint) SetX(x *big.Int) {
+func (p *AffinePoint) SetX(x *big.Int) {
   p.x.Set(x)
 }
 
-func (p *ECPoint) SetY(y *big.Int) {
+func (p *AffinePoint) SetY(y *big.Int) {
   p.y.Set(y)
 }
 
-func (p *ECPoint) SetZero(v bool) {
+func (p *AffinePoint) SetZero(v bool) {
   p.isZero = v
 }
 
-func (p ECPoint) String() string {
+func (p AffinePoint) String() string {
   if p.IsZero() {
     return fmt.Sprintf("(zero)")
   } else {
     return fmt.Sprintf("(%v,%v)", p.x, p.y)
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
+type ProjectivePoint struct {
+  x, y, z *big.Int
+}
+
+/* -------------------------------------------------------------------------- */
+
+func NewProjectivePoint(x_, y_, z_ *big.Int) ProjectivePoint {
+  x := big.NewInt(0)
+  y := big.NewInt(0)
+  z := big.NewInt(1)
+  if x_ != nil {
+    x.Set(x_)
+  }
+  if y_ != nil {
+    y.Set(y_)
+  }
+  if y_ != nil {
+    z.Set(z_)
+  }
+  return ProjectivePoint{x, y, z}
+}
+
+func NullProjectivePoint() ProjectivePoint {
+  x := big.NewInt(0)
+  y := big.NewInt(1)
+  z := big.NewInt(0)
+  return ProjectivePoint{x, y, z}
+}
+
+/* -------------------------------------------------------------------------- */
+
+func (p ProjectivePoint) Clone() ProjectivePoint {
+  q := NullProjectivePoint()
+  q.x.Set(p.x)
+  q.y.Set(p.y)
+  q.z.Set(p.z)
+  return q
+}
+
+func (p ProjectivePoint) IsZero() bool {
+  return p.z.Cmp(big.NewInt(0)) == 0
+}
+
+func (p ProjectivePoint) GetX() *big.Int {
+  return p.x
+}
+
+func (p ProjectivePoint) GetY() *big.Int {
+  return p.y
+}
+
+func (p ProjectivePoint) GetZ() *big.Int {
+  return p.z
+}
+
+func (p *ProjectivePoint) Set(q ProjectivePoint) {
+  p.x.Set(q.x)
+  p.y.Set(q.y)
+  p.z.Set(q.z)
+}
+
+func (p *ProjectivePoint) SetX(x *big.Int) {
+  p.x.Set(x)
+}
+
+func (p *ProjectivePoint) SetY(y *big.Int) {
+  p.y.Set(y)
+}
+
+func (p *ProjectivePoint) SetZ(z *big.Int) {
+  p.z.Set(z)
+}
+
+func (p *ProjectivePoint) SetZero(v bool) {
+  p.x.SetInt64(0)
+  p.y.SetInt64(1)
+  p.z.SetInt64(0)
+}
+
+func (p ProjectivePoint) String() string {
+  if p.IsZero() {
+    return fmt.Sprintf("(zero)")
+  } else {
+    return fmt.Sprintf("(%v:%v:%v)", p.x, p.y, p.z)
   }
 }

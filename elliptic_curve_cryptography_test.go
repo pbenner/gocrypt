@@ -49,7 +49,7 @@ func TestECC1(t *testing.T) {
   aPrv.SetBytes(aPrvTmp)
 
   // multiply base point with the two integers
-  a := NullECPoint()
+  a := NullAffinePoint()
   a  = Secp521r1.Eval(a, aPub)
   a  = Secp521r1.Eval(a, aPrv)
 

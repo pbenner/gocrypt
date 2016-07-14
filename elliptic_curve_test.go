@@ -31,11 +31,11 @@ func TestEllipticCurve1(t *testing.T) {
     big.NewInt(7),
     big.NewInt(17))
 
-  p := NewECPoint(
+  p := NewAffinePoint(
     big.NewInt(2),
     big.NewInt(0))
 
-  q := NewECPoint(
+  q := NewAffinePoint(
     big.NewInt(1),
     big.NewInt(3))
 
@@ -57,7 +57,7 @@ func TestEllipticCurve2(t *testing.T) {
     big.NewInt(7),
     big.NewInt(17))
 
-  p := NewECPoint(
+  p := NewAffinePoint(
     big.NewInt(1),
     big.NewInt(3))
 
@@ -79,7 +79,7 @@ func TestEllipticCurve3(t *testing.T) {
     big.NewInt(7),
     big.NewInt(17))
 
-  p := NewECPoint(
+  p := NewAffinePoint(
     big.NewInt(1),
     big.NewInt(3))
 
@@ -106,11 +106,11 @@ func TestEllipticCurve4(t *testing.T) {
     big.NewInt(2),
     big.NewInt(17))
 
-  p := NewECPoint(
+  p := NewAffinePoint(
     big.NewInt(5),
     big.NewInt(1))
 
-  r := NullECPoint()
+  r := NullAffinePoint()
   r.Set(p)
   for i := 0; i < 18; i++ {
     r  = c.Add(r, p)

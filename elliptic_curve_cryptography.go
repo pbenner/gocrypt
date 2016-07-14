@@ -25,7 +25,7 @@ import "math/big"
 
 type ECC struct {
   Curve EllipticCurve
-  G     ECPoint
+  G     AffinePoint
   N, H  *big.Int
 }
 
@@ -39,15 +39,15 @@ func NewECC(p, a, b, x_, y_, n_, h_ *big.Int) ECC {
   n.Set(n_)
   h := big.NewInt(0)
   h.Set(h_)
-  g := NewECPoint(x, y)
+  g := NewAffinePoint(x, y)
   return ECC{curve, g, n, h}
 }
 
-func (ecc ECC) Base() ECPoint {
+func (ecc ECC) Base() AffinePoint {
   return ecc.G.Clone()
 }
 
-func (ecc ECC) Eval(a ECPoint, b *big.Int) ECPoint {
+func (ecc ECC) Eval(a AffinePoint, b *big.Int) AffinePoint {
   if a.IsZero() {
     return ecc.Curve.MulInt(ecc.G, b)
   } else {
