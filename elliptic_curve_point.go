@@ -173,8 +173,6 @@ func (p *ProjectivePoint) SetZ(z *big.Int) {
 }
 
 func (p *ProjectivePoint) SetZero(v bool) {
-  p.x.SetInt64(0)
-  p.y.SetInt64(1)
   p.z.SetInt64(0)
 }
 

@@ -39,7 +39,8 @@ func NewEllipticCurve(a_, b_, p *big.Int) EllipticCurve {
   return EllipticCurve{a, b, f}
 }
 
-/* -------------------------------------------------------------------------- */
+/* affine algebra
+ * -------------------------------------------------------------------------- */
 
 func (ec EllipticCurve) Add(p, q AffinePoint) AffinePoint {
 
@@ -112,5 +113,49 @@ func (ec EllipticCurve) MulInt(p AffinePoint, n *big.Int) AffinePoint {
       r = ec.Add(r, p)
     }
   }
+  return r
+}
+
+/* projective algebra
+ * -------------------------------------------------------------------------- */
+
+func (ec EllipticCurve) DoubleProjective(p ProjectivePoint) ProjectivePoint {
+
+  r := NullProjectivePoint()
+
+  if p.IsZero() {
+    return r
+  }
+
+  a := big.NewInt(0)
+  a.Mul(p.y, p.y)
+  b := big.NewInt(4)
+  b.Mul(b, p.x)
+  b.Mul(b, a)
+  c := big.NewInt(8)
+  c.Mul(c, a)
+  c.Mul(c, a)
+  t := big.NewInt(0)
+  t.Mul(ec.a, p.z)
+  t.Mul(   t, p.z)
+  t.Mul(   t, p.z)
+  t.Mul(   t, p.z)
+  d := big.NewInt(3)
+  d.Mul(d, p.x)
+  d.Mul(d, p.x)
+  d.Add(d, t)
+
+  r.x.Mul(d, d)
+  r.x.Sub(r.x, b)
+  r.x.Sub(r.x, b)
+
+  r.y.Sub(b, r.x)
+  r.y.Mul(r.y, d)
+  r.y.Sub(r.y, c)
+
+  r.z.SetInt64(2)
+  r.z.Mul(r.z, p.y)
+  r.z.Mul(r.z, p.z)
+
   return r
 }
