@@ -100,7 +100,7 @@ func (ec EllipticCurve) Neg(p AffinePoint) AffinePoint {
 
 func (ec EllipticCurve) MulInt(p AffinePoint, n *big.Int) AffinePoint {
 
-  r := NewAffinePoint(nil, nil)
+  r := NullAffinePoint()
 
   for i := 0; i < n.BitLen(); i++ {
     j := n.BitLen() - i - 1
@@ -112,7 +112,7 @@ func (ec EllipticCurve) MulInt(p AffinePoint, n *big.Int) AffinePoint {
   return r
 }
 
-/* projective algebra
+/* projective algebra (cf. Hankerson et al. 2003, pp. 88)
  * -------------------------------------------------------------------------- */
 
 func (ec EllipticCurve) DoubleProjective(p ProjectivePoint) ProjectivePoint {
@@ -156,7 +156,7 @@ func (ec EllipticCurve) DoubleProjective(p ProjectivePoint) ProjectivePoint {
   return r
 }
 
-func (ec EllipticCurve) AddMixed(p, q ProjectivePoint) ProjectivePoint {
+func (ec EllipticCurve) AddMixed(p ProjectivePoint, q AffinePoint) ProjectivePoint {
 
   r := NullProjectivePoint()
 
@@ -164,7 +164,7 @@ func (ec EllipticCurve) AddMixed(p, q ProjectivePoint) ProjectivePoint {
     return r
   }
   if p.IsZero() {
-    r.Set(q)
+    r.SetAffine(q)
     return r
   }
   if q.IsZero() {
@@ -202,6 +202,36 @@ func (ec EllipticCurve) AddMixed(p, q ProjectivePoint) ProjectivePoint {
   ec.f.Sub(r.y, r.y, h)
 
   ec.f.Mul(r.z, p.z, e)
+
+  return r
+}
+
+func (ec EllipticCurve) NegProjective(p ProjectivePoint) ProjectivePoint {
+
+  r := p.Clone()
+  r.y.Neg(r.y)
+
+  return r
+}
+
+func (ec EllipticCurve) MulIntProjective(q AffinePoint, n *big.Int) AffinePoint {
+
+  p := NullProjectivePoint()
+  r := NullAffinePoint()
+
+  for i := 0; i < n.BitLen(); i++ {
+    j := n.BitLen() - i - 1
+    p  = ec.DoubleProjective(p)
+    if n.Bit(j) != 0 {
+      p = ec.AddMixed(p, q)
+    }
+  }
+  // convert to affine point
+  t := big.NewInt(0)
+  ec.f.Mul(t, p.z, p.z)
+  ec.f.Div(r.x, p.x, t)
+  ec.f.Mul(t, t, p.z)
+  ec.f.Div(r.y, p.y, t)
 
   return r
 }

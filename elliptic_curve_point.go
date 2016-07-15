@@ -160,6 +160,12 @@ func (p *ProjectivePoint) Set(q ProjectivePoint) {
   p.z.Set(q.z)
 }
 
+func (p *ProjectivePoint) SetAffine(q AffinePoint) {
+  p.x.Set(q.x)
+  p.y.Set(q.y)
+  p.z.SetInt64(1)
+}
+
 func (p *ProjectivePoint) SetX(x *big.Int) {
   p.x.Set(x)
 }
