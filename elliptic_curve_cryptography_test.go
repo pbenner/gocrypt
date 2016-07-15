@@ -28,6 +28,43 @@ import "crypto/elliptic"
 
 func TestECC1(t *testing.T) {
 
+  g := Secp521r1.Base()
+  x := NullProjectivePoint()
+  x.SetAffine(g)
+  a := Secp521r1.Curve.AffineFromProjective(Secp521r1.Curve.DoubleProjective(x))
+
+  // repeat the same with the go crypt library
+  d := elliptic.P521()
+  Bx, By := d.Double(x.x, x.y)
+  b := NewAffinePoint(Bx, By)
+
+  if !a.Equals(b) {
+    t.Error("elliptic curve cryptography test failed")
+  }
+}
+
+func TestECC2(t *testing.T) {
+
+  g := Secp521r1.Base()
+  s := NullProjectivePoint()
+  s.SetAffine(g)
+  xp := Secp521r1.Curve.DoubleProjective(s)
+  xf := Secp521r1.Curve.AffineFromProjective(xp)
+  // fmt.Println("s':",s)
+  a := Secp521r1.Curve.AffineFromProjective(Secp521r1.Curve.AddMixed(xp, g))
+
+  // repeat the same with the go crypt library
+  d := elliptic.P521()
+  Bx, By := d.Add(xf.x, xf.y, g.x, g.y)
+  b := NewAffinePoint(Bx, By)
+
+  if !a.Equals(b) {
+    t.Error("elliptic curve cryptography test failed")
+  }
+}
+
+func TestECC3(t *testing.T) {
+
   aPub := big.NewInt(0)
   aPrv := big.NewInt(0)
 

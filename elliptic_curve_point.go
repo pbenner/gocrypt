@@ -54,7 +54,15 @@ func (p AffinePoint) Clone() AffinePoint {
   q := NullAffinePoint()
   q.x.Set(p.x)
   q.y.Set(p.y)
+  q.isZero = p.isZero
   return q
+}
+
+func (p AffinePoint) Equals(q AffinePoint) bool {
+  if p.x.Cmp(q.x) == 0 && p.y.Cmp(q.y) == 0 {
+    return true
+  }
+  return false
 }
 
 func (p AffinePoint) IsZero() bool {
@@ -107,8 +115,8 @@ type ProjectivePoint struct {
 
 func NewProjectivePoint(x_, y_, z_ *big.Int) ProjectivePoint {
   x := big.NewInt(0)
-  y := big.NewInt(0)
-  z := big.NewInt(1)
+  y := big.NewInt(1)
+  z := big.NewInt(0)
   if x_ != nil {
     x.Set(x_)
   }
@@ -136,6 +144,13 @@ func (p ProjectivePoint) Clone() ProjectivePoint {
   q.y.Set(p.y)
   q.z.Set(p.z)
   return q
+}
+
+func (p ProjectivePoint) Equals(q ProjectivePoint) bool {
+  if p.x.Cmp(q.x) == 0 && p.y.Cmp(q.y) == 0 && p.z.Cmp(q.z) == 0 {
+    return true
+  }
+  return false
 }
 
 func (p ProjectivePoint) IsZero() bool {

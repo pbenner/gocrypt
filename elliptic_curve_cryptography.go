@@ -49,9 +49,9 @@ func (ecc ECC) Base() AffinePoint {
 
 func (ecc ECC) Eval(a AffinePoint, b *big.Int) AffinePoint {
   if a.IsZero() {
-    return ecc.Curve.MulInt(ecc.G, b)
+    return ecc.Curve.MulIntProjective(ecc.G, b)
   } else {
-    return ecc.Curve.MulInt(a, b)
+    return ecc.Curve.MulIntProjective(a, b)
   }
 }
 
