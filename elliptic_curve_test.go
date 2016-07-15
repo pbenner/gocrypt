@@ -39,7 +39,7 @@ func TestEllipticCurve1(t *testing.T) {
     big.NewInt(1),
     big.NewInt(3))
 
-  r := c.Add(p, q)
+  r := c.AddAffine(p, q)
 
   if r.x.Cmp(big.NewInt(6)) != 0 {
     t.Error("elliptic curve test failed")
@@ -61,7 +61,7 @@ func TestEllipticCurve2(t *testing.T) {
     big.NewInt(1),
     big.NewInt(3))
 
-  r := c.Add(p, p)
+  r := c.AddAffine(p, p)
 
   if r.x.Cmp(big.NewInt(6)) != 0 {
     t.Error("elliptic curve test failed")
@@ -83,12 +83,12 @@ func TestEllipticCurve3(t *testing.T) {
     big.NewInt(1),
     big.NewInt(3))
 
-  r := c.Add(p, p)
+  r := c.AddAffine(p, p)
   for i := 0; i < 11; i++ {
-    r  = c.Add(r, p)
+    r  = c.AddAffine(r, p)
   }
 
-  s := c.MulInt(p, big.NewInt(13))
+  s := c.MulIntAffine(p, big.NewInt(13))
 
   if r.x.Cmp(s.x) != 0 {
     t.Error("elliptic curve test failed")
@@ -113,7 +113,7 @@ func TestEllipticCurve4(t *testing.T) {
   r := NullAffinePoint()
   r.Set(p)
   for i := 0; i < 18; i++ {
-    r  = c.Add(r, p)
+    r  = c.AddAffine(r, p)
   }
 
   if !r.IsZero() {

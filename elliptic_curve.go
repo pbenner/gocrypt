@@ -42,7 +42,7 @@ func NewEllipticCurve(a_, b_, p *big.Int) EllipticCurve {
 /* affine algebra
  * -------------------------------------------------------------------------- */
 
-func (ec EllipticCurve) Add(p, q AffinePoint) AffinePoint {
+func (ec EllipticCurve) AddAffine(p, q AffinePoint) AffinePoint {
 
   r := NullAffinePoint()
 
@@ -90,7 +90,7 @@ func (ec EllipticCurve) Add(p, q AffinePoint) AffinePoint {
   return r
 }
 
-func (ec EllipticCurve) Neg(p AffinePoint) AffinePoint {
+func (ec EllipticCurve) NegAffine(p AffinePoint) AffinePoint {
 
   r := NewAffinePoint(p.x, p.y)
   r.y.Neg(r.y)
@@ -98,15 +98,15 @@ func (ec EllipticCurve) Neg(p AffinePoint) AffinePoint {
   return r
 }
 
-func (ec EllipticCurve) MulInt(p AffinePoint, n *big.Int) AffinePoint {
+func (ec EllipticCurve) MulIntAffine(p AffinePoint, n *big.Int) AffinePoint {
 
   r := NullAffinePoint()
 
   for i := 0; i < n.BitLen(); i++ {
     j := n.BitLen() - i - 1
-    r  = ec.Add(r, r)
+    r  = ec.AddAffine(r, r)
     if n.Bit(j) != 0 {
-      r = ec.Add(r, p)
+      r = ec.AddAffine(r, p)
     }
   }
   return r
