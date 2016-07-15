@@ -25,7 +25,6 @@ import "math/big"
 
 type AffinePoint struct {
   x, y *big.Int
-  isZero bool
 }
 
 /* -------------------------------------------------------------------------- */
@@ -39,13 +38,13 @@ func NewAffinePoint(x_, y_ *big.Int) AffinePoint {
   if y_ != nil {
     y.Set(y_)
   }
-  return AffinePoint{x, y, false}
+  return AffinePoint{x, y}
 }
 
 func NullAffinePoint() AffinePoint {
   x := big.NewInt(0)
   y := big.NewInt(0)
-  return AffinePoint{x, y, true}
+  return AffinePoint{x, y}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -54,7 +53,6 @@ func (p AffinePoint) Clone() AffinePoint {
   q := NullAffinePoint()
   q.x.Set(p.x)
   q.y.Set(p.y)
-  q.isZero = p.isZero
   return q
 }
 
@@ -66,7 +64,11 @@ func (p AffinePoint) Equals(q AffinePoint) bool {
 }
 
 func (p AffinePoint) IsZero() bool {
-  return p.isZero
+  zero := big.NewInt(0)
+  if p.x.Cmp(zero) == 0 && p.y.Cmp(zero) == 0 {
+    return true
+  }
+  return false
 }
 
 func (p AffinePoint) GetX() *big.Int {
@@ -78,11 +80,8 @@ func (p AffinePoint) GetY() *big.Int {
 }
 
 func (p *AffinePoint) Set(q AffinePoint) {
-  p.isZero = q.isZero
-  if !p.isZero {
-    p.x.Set(q.x)
-    p.y.Set(q.y)
-  }
+  p.x.Set(q.x)
+  p.y.Set(q.y)
 }
 
 func (p *AffinePoint) SetX(x *big.Int) {
@@ -93,16 +92,13 @@ func (p *AffinePoint) SetY(y *big.Int) {
   p.y.Set(y)
 }
 
-func (p *AffinePoint) SetZero(v bool) {
-  p.isZero = v
+func (p *AffinePoint) SetZero() {
+  p.x.SetInt64(0)
+  p.y.SetInt64(0)
 }
 
 func (p AffinePoint) String() string {
-  if p.IsZero() {
-    return fmt.Sprintf("(zero)")
-  } else {
-    return fmt.Sprintf("(%v,%v)", p.x, p.y)
-  }
+  return fmt.Sprintf("(%v,%v)", p.x, p.y)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -176,9 +172,15 @@ func (p *ProjectivePoint) Set(q ProjectivePoint) {
 }
 
 func (p *ProjectivePoint) SetAffine(q AffinePoint) {
-  p.x.Set(q.x)
-  p.y.Set(q.y)
-  p.z.SetInt64(1)
+  if q.IsZero() {
+    p.x.SetInt64(0)
+    p.y.SetInt64(1)
+    p.z.SetInt64(0)
+  } else {
+    p.x.Set(q.x)
+    p.y.Set(q.y)
+    p.z.SetInt64(1)
+  }
 }
 
 func (p *ProjectivePoint) SetX(x *big.Int) {

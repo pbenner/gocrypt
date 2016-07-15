@@ -86,7 +86,7 @@ func (ec EllipticCurve) AddAffine(p, q AffinePoint) AffinePoint {
   f.Mul(r.y, r.y, s)
   f.Add(r.y, r.y, p.y)
   f.Neg(r.y, r.y)
-  r.SetZero(false)
+
   return r
 }
 
@@ -253,7 +253,6 @@ func (ec EllipticCurve) AffineFromProjective(p ProjectivePoint) AffinePoint {
   ec.f.Mul(r.x, p.x, s)
   ec.f.Mul(s, s, t) // 1/z^3
   ec.f.Mul(r.y, p.y, s)
-  r.SetZero(false)
 
   return r
 }
