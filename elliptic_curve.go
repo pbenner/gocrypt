@@ -50,15 +50,11 @@ func (ec EllipticCurve) Add(p, q AffinePoint) AffinePoint {
     return r
   }
   if p.IsZero() {
-    r.SetZero(false)
-    r.x = q.x
-    r.y = q.y
+    r.Set(q)
     return r
   }
   if q.IsZero() {
-    r.SetZero(false)
-    r.x = p.x
-    r.y = p.y
+    r.Set(p)
     return r
   }
 
@@ -128,34 +124,84 @@ func (ec EllipticCurve) DoubleProjective(p ProjectivePoint) ProjectivePoint {
   }
 
   a := big.NewInt(0)
-  a.Mul(p.y, p.y)
+  ec.f.Mul(a, p.y, p.y)
   b := big.NewInt(4)
-  b.Mul(b, p.x)
-  b.Mul(b, a)
+  ec.f.Mul(b, b, p.x)
+  ec.f.Mul(b, b, a)
   c := big.NewInt(8)
-  c.Mul(c, a)
-  c.Mul(c, a)
+  ec.f.Mul(c, c, a)
+  ec.f.Mul(c, c, a)
   t := big.NewInt(0)
-  t.Mul(ec.a, p.z)
-  t.Mul(   t, p.z)
-  t.Mul(   t, p.z)
-  t.Mul(   t, p.z)
+  ec.f.Mul(t, ec.a, p.z)
+  ec.f.Mul(t,    t, p.z)
+  ec.f.Mul(t,    t, p.z)
+  ec.f.Mul(t,    t, p.z)
   d := big.NewInt(3)
-  d.Mul(d, p.x)
-  d.Mul(d, p.x)
-  d.Add(d, t)
+  ec.f.Mul(d, d, p.x)
+  ec.f.Mul(d, d, p.x)
+  ec.f.Add(d, d, t)
 
-  r.x.Mul(d, d)
-  r.x.Sub(r.x, b)
-  r.x.Sub(r.x, b)
+  ec.f.Mul(r.x, d, d)
+  ec.f.Sub(r.x, r.x, b)
+  ec.f.Sub(r.x, r.x, b)
 
-  r.y.Sub(b, r.x)
-  r.y.Mul(r.y, d)
-  r.y.Sub(r.y, c)
+  ec.f.Sub(r.y, b, r.x)
+  ec.f.Mul(r.y, r.y, d)
+  ec.f.Sub(r.y, r.y, c)
 
   r.z.SetInt64(2)
-  r.z.Mul(r.z, p.y)
-  r.z.Mul(r.z, p.z)
+  ec.f.Mul(r.z, r.z, p.y)
+  ec.f.Mul(r.z, r.z, p.z)
+
+  return r
+}
+
+func (ec EllipticCurve) AddMixed(p, q ProjectivePoint) ProjectivePoint {
+
+  r := NullProjectivePoint()
+
+  if p.IsZero() && q.IsZero() {
+    return r
+  }
+  if p.IsZero() {
+    r.Set(q)
+    return r
+  }
+  if q.IsZero() {
+    r.Set(p)
+    return r
+  }
+
+  a := big.NewInt(0)
+  ec.f.Mul(a, p.z, p.z)
+  b := big.NewInt(0)
+  ec.f.Mul(b, p.z, a)
+  c := big.NewInt(0)
+  ec.f.Mul(c, q.x, a)
+  d := big.NewInt(0)
+  ec.f.Mul(d, q.y, b)
+  e := big.NewInt(0)
+  ec.f.Sub(e, c, p.x)
+  f := big.NewInt(0)
+  ec.f.Sub(f, d, p.y)
+  g := big.NewInt(0)
+  ec.f.Mul(g, e, e)
+  h := big.NewInt(0)
+  ec.f.Mul(h, g, e)
+  i := big.NewInt(0)
+  ec.f.Mul(i, p.x, g)
+
+  ec.f.Mul(r.x, f, f)
+  ec.f.Sub(r.x, r.x, h)
+  ec.f.Sub(r.x, r.x, i)
+  ec.f.Sub(r.x, r.x, i)
+
+  ec.f.Sub(r.y, i, h)
+  ec.f.Mul(r.y, r.y, f)
+  ec.f.Mul(h, h, p.y)
+  ec.f.Sub(r.y, r.y, h)
+
+  ec.f.Mul(r.z, p.z, e)
 
   return r
 }

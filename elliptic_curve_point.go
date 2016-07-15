@@ -172,7 +172,7 @@ func (p *ProjectivePoint) SetZ(z *big.Int) {
   p.z.Set(z)
 }
 
-func (p *ProjectivePoint) SetZero(v bool) {
+func (p *ProjectivePoint) SetZero() {
   p.z.SetInt64(0)
 }
 
