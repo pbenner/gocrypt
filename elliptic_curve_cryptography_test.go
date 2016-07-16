@@ -41,6 +41,9 @@ func TestECC1(t *testing.T) {
   if !a.Equals(b) {
     t.Error("elliptic curve cryptography test failed")
   }
+  if !Secp521r1.Curve.FeasibleAffinePoint(a) {
+    t.Error("elliptic curve cryptography test failed")
+  }
 }
 
 func TestECC2(t *testing.T) {

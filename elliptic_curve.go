@@ -112,6 +112,21 @@ func (ec EllipticCurve) MulIntAffine(p AffinePoint, n *big.Int) AffinePoint {
   return r
 }
 
+func (ec EllipticCurve) FeasibleAffinePoint(p AffinePoint) bool {
+  s := big.NewInt(0)
+  t := big.NewInt(0)
+
+  ec.f.Mul(s, p.x, p.x)
+  ec.f.Mul(s, s, p.x)
+  ec.f.Mul(t, ec.a, p.x)
+  ec.f.Add(s, s, t)
+  ec.f.Add(s, s, ec.b)
+
+  ec.f.Mul(t, p.y, p.y)
+
+  return s.Cmp(t) == 0
+}
+
 /* projective algebra (cf. Hankerson et al. 2003, pp. 88)
  * -------------------------------------------------------------------------- */
 
