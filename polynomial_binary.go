@@ -87,6 +87,26 @@ func (r *BinaryPolynomial) Lead() (int, int) {
 
 /* -------------------------------------------------------------------------- */
 
+func (r *BinaryPolynomial) Realloc(n int) {
+  if cap(r.Terms) < n {
+    r.Terms = make([]byte, n, 2*n)
+  } else {
+    r.Terms = r.Terms[0:n]
+  }
+}
+
+func (r *BinaryPolynomial) Resize(n int) {
+  if cap(r.Terms) < n {
+    t := make([]byte, n, 2*n)
+    copy(t, r.Terms)
+    r.Terms = t
+  } else {
+    r.Terms = r.Terms[0:n]
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (r *BinaryPolynomial) SetZero() {
   for i := 0; i < len(r.Terms); i++ {
     r.Terms[i] = 0
@@ -149,21 +169,19 @@ func (r *BinaryPolynomial) Add(a, b *BinaryPolynomial) {
       r.Terms[i] = a.Terms[i] ^ b.Terms[i]
     }
   } else {
-    terms := r.Terms
     if n < m {
       a, b = b, a
       n, m = m, n
     }
     if len(r.Terms) != n {
-      terms = make([]byte, n, 2*n)
+      r.Resize(n)
     }
     for i := 0; i < m; i++ {
-      terms[i] = a.Terms[i] ^ b.Terms[i]
+      r.Terms[i] = a.Terms[i] ^ b.Terms[i]
     }
     for i := m; i < n; i++ {
-      terms[i] = b.Terms[i]
+      r.Terms[i] = a.Terms[i]
     }
-    r.Terms = terms
   }
 }
 
