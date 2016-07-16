@@ -33,8 +33,7 @@ type BinaryPolynomial struct {
 
 func NewBinaryPolynomial(n int) *BinaryPolynomial {
   r := BinaryPolynomial{}
-  r.Terms = make([]byte, n, 2*n)
-  r.SetZero()
+  r.Realloc(n)
   return &r
 }
 
@@ -47,6 +46,9 @@ func (r *BinaryPolynomial) Clone() *BinaryPolynomial {
 }
 
 func (r *BinaryPolynomial) AddTerm(c, e int) {
+  if e/8+1 > len(r.Terms) {
+    r.Resize(e/8+1)
+  }
   r.Terms[e/8] ^= byte(c%2) << byte(e%8)
 }
 
