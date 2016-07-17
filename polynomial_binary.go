@@ -89,6 +89,16 @@ func (r *BinaryPolynomial) Lead() (int, int) {
 
 /* -------------------------------------------------------------------------- */
 
+func (r *BinaryPolynomial) Shrink() {
+  for i := len(r.Terms); i > 0; i-- {
+    if r.Terms[i-1] == 0 {
+      r.Terms = r.Terms[0:i-1]
+    } else {
+      break
+    }
+  }
+}
+
 func (r *BinaryPolynomial) Realloc(n int) {
   if cap(r.Terms) < n {
     r.Terms = make([]byte, n, 2*n)
@@ -117,7 +127,7 @@ func (r *BinaryPolynomial) SetZero() {
 
 func (r *BinaryPolynomial) Set(a *BinaryPolynomial) {
   if len(r.Terms) != len(a.Terms) {
-    r.Terms = make([]byte, len(a.Terms), 2*len(a.Terms))
+    r.Realloc(len(a.Terms))
   }
   copy(r.Terms, a.Terms)
 }
@@ -185,6 +195,7 @@ func (r *BinaryPolynomial) Add(a, b *BinaryPolynomial) {
       r.Terms[i] = a.Terms[i]
     }
   }
+  r.Shrink()
 }
 
 /* -------------------------------------------------------------------------- */
@@ -224,10 +235,39 @@ func (r *BinaryPolynomial) Mul(a, b *BinaryPolynomial) {
 
 /* -------------------------------------------------------------------------- */
 
+func (r *BinaryPolynomial) div(a, b *BinaryPolynomial, remainder bool) {
+  z := NewBinaryPolynomial(0)
+  t := NewBinaryPolynomial(len(a.Terms))
+  q := NewBinaryPolynomial(len(a.Terms))
+  s := a.Clone()
+  if b.Equals(z) {
+    panic("Div(): division by zero")
+  }
+  _, e2 := b.Lead()
+  for !s.Equals(z) && s.Degree() >= b.Degree() {
+    _, e1 := s.Lead()
+    // new exponent
+    e := e1-e2
+    t.SetZero()
+    t.AddTerm(1, e)
+    q.AddTerm(1, e)
+    t.Mul(t, b)
+    s.Sub(s, t)
+  }
+  if remainder {
+    r.Set(s)
+  } else {
+    r.Set(q)
+  }
+  r.Shrink()
+}
+
 func (r *BinaryPolynomial) Div(a, b *BinaryPolynomial) {
+  r.div(a, b, false)
 }
 
 func (r *BinaryPolynomial) Mod(a, b *BinaryPolynomial) {
+  r.div(a, b, true)
 }
 
 /* -------------------------------------------------------------------------- */
