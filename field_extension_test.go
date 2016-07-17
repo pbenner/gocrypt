@@ -23,7 +23,7 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestFiniteField1(t *testing.T) {
+func TestFieldExtension1(t *testing.T) {
 
   pf := NewPrimeField(2)
 
@@ -33,7 +33,7 @@ func TestFiniteField1(t *testing.T) {
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
 
-  f := NewFiniteField(p)
+  f := NewFieldExtension(p)
 
   a := NewPolynomial(pf)
   a.AddTerm(1, 3)
@@ -53,7 +53,7 @@ func TestFiniteField1(t *testing.T) {
   }
 }
 
-func TestFiniteField2(t *testing.T) {
+func TestFieldExtension2(t *testing.T) {
 
   pf := NewPrimeField(2)
 
@@ -65,7 +65,7 @@ func TestFiniteField2(t *testing.T) {
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
 
-  f := NewFiniteField(p)
+  f := NewFieldExtension(p)
 
   a := NewPolynomial(pf)
   a.AddTerm(1, 0)
@@ -88,7 +88,7 @@ func TestFiniteField2(t *testing.T) {
   }
 }
 
-func TestFiniteField3(t *testing.T) {
+func TestFieldExtension3(t *testing.T) {
 
   pf := NewPrimeField(2)
 
@@ -100,7 +100,7 @@ func TestFiniteField3(t *testing.T) {
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
 
-  f := NewFiniteField(p)
+  f := NewFieldExtension(p)
 
   zero := f.Zero()
   one  := f.One()

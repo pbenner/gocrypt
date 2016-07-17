@@ -62,7 +62,7 @@ func main() {
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
   // create GF(2^8) with irriducible polynomial p
-  f := NewFiniteField(p)
+  f := NewFieldExtension(p)
 
   // allocate memory and compute results
   aesMixColAdd := make([][]byte, 0xFF+1)

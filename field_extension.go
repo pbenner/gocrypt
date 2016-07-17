@@ -22,60 +22,60 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
-type FiniteField struct {
+type FieldExtension struct {
   IP *Polynomial
 }
 
 /* -------------------------------------------------------------------------- */
 
-func NewFiniteField(ip *Polynomial) FiniteField {
-  return FiniteField{ip}
+func NewFieldExtension(ip *Polynomial) FieldExtension {
+  return FieldExtension{ip}
 }
 
 /* -------------------------------------------------------------------------- */
 
-func (f FiniteField) Add(a, b *Polynomial) *Polynomial {
+func (f FieldExtension) Add(a, b *Polynomial) *Polynomial {
   r := NewPolynomial(f.IP.Field)
   r.Add(a, b)
   return r
 }
 
-func (f FiniteField) Sub(a, b *Polynomial) *Polynomial {
+func (f FieldExtension) Sub(a, b *Polynomial) *Polynomial {
   r := NewPolynomial(f.IP.Field)
   r.Sub(a, b)
   return r
 }
 
-func (f FiniteField) Mul(a, b *Polynomial) *Polynomial {
+func (f FieldExtension) Mul(a, b *Polynomial) *Polynomial {
   r := NewPolynomial(f.IP.Field)
   r.Mul(a, b)
   r.Mod(r, f.IP)
   return r
 }
 
-func (f FiniteField) Div(a, b *Polynomial) *Polynomial {
+func (f FieldExtension) Div(a, b *Polynomial) *Polynomial {
   r := NewPolynomial(f.IP.Field)
   _, _, t := PolynomialEEA(f.IP, b)
   r.Mul(a, t)
   return r
 }
 
-func (f FiniteField) Zero() *Polynomial {
+func (f FieldExtension) Zero() *Polynomial {
   r := NewPolynomial(f.IP.Field)
   return r
 }
 
-func (f FiniteField) One() *Polynomial {
+func (f FieldExtension) One() *Polynomial {
   r := NewPolynomial(f.IP.Field)
   r.AddTerm(1, 0)
   return r
 }
 
-func (f FiniteField) IsZero(a *Polynomial) bool {
+func (f FieldExtension) IsZero(a *Polynomial) bool {
   return len(a.Terms) == 0
 }
 
-func (f FiniteField) IsOne(a *Polynomial) bool {
+func (f FieldExtension) IsOne(a *Polynomial) bool {
   if len(a.Terms) == 1 {
     if v, ok := a.Terms[0]; ok {
       return f.IP.Field.IsOne(v)

@@ -52,7 +52,7 @@ func BigEEA(ri_, rj_ *big.Int) (*big.Int, *big.Int, *big.Int) {
     // q_i-1 = (r_i-2 - r_i)/r_i-1
     qj.Sub(ri, rk)
     qj.Div(qj, rj)
-    // s_i = s_i-2 - q_i-1*s_i-1  
+    // s_i = s_i-2 - q_i-1*s_i-1
     sk.Mul(qj, sj)
     sk.Sub(si, sk)
     // t_i = t_i-2 - q_i-1*t_i-1
@@ -95,7 +95,55 @@ func PolynomialEEA(ri, rj *Polynomial) (*Polynomial, *Polynomial, *Polynomial) {
     // q_i-1 = (r_i-2 - r_i)/r_i-1
     qj.Sub(ri, rk)
     qj.Div(qj, rj)
-    // s_i = s_i-2 - q_i-1*s_i-1  
+    // s_i = s_i-2 - q_i-1*s_i-1
+    sk.Mul(qj, sj)
+    sk.Sub(si, sk)
+    // t_i = t_i-2 - q_i-1*t_i-1
+    tk.Mul(qj, tj)
+    tk.Sub(ti, tk)
+
+    si, sj, sk = sj, sk, si
+    ti, tj, tk = tj, tk, ti
+    ri, rj, rk = rj, rk, ri
+  }
+  if _, e := ri.Lead(); e == 0 {
+    si.Div(si, ri)
+    ti.Div(ti, ri)
+    ri.Div(ri, ri)
+  }
+  // gcd(r0, r1) = ri = s r_0 + t r_1
+  return ri, si, ti
+}
+
+/* -------------------------------------------------------------------------- */
+
+func BinaryPolynomialEEA(ri, rj *BinaryPolynomial) (*BinaryPolynomial, *BinaryPolynomial, *BinaryPolynomial) {
+
+  n := len(ri.Terms)
+
+  z0 := NewBinaryPolynomial(0)
+  si := NewBinaryPolynomial(n)
+  si.AddTerm(1, 0)
+  ti := NewBinaryPolynomial(n)
+  ri  = ri.Clone()
+  // j = i+1
+  sj := NewBinaryPolynomial(n)
+  tj := NewBinaryPolynomial(n)
+  tj.AddTerm(1, 0)
+  qj := NewBinaryPolynomial(n)
+  rj  = rj.Clone()
+  // k = j+1
+  sk := NewBinaryPolynomial(n)
+  tk := NewBinaryPolynomial(n)
+  rk := NewBinaryPolynomial(n)
+
+  for !rj.Equals(z0) {
+    // r_i = r_i-2 mod r_i-1
+    rk.Mod(ri, rj)
+    // q_i-1 = (r_i-2 - r_i)/r_i-1
+    qj.Sub(ri, rk)
+    qj.Div(qj, rj)
+    // s_i = s_i-2 - q_i-1*s_i-1
     sk.Mul(qj, sj)
     sk.Sub(si, sk)
     // t_i = t_i-2 - q_i-1*t_i-1
@@ -138,7 +186,7 @@ func EEA(ri, rj int) (int, int, int) {
     rk = ri % rj
     // q_i-1 = (r_i-2 - r_i)/r_i-1
     qj = (ri - rk)/rj
-    // s_i = s_i-2 - q_i-1*s_i-1  
+    // s_i = s_i-2 - q_i-1*s_i-1
     sk = si - qj * sj
     // t_i = t_i-2 - q_i-1*t_i-1
     tk = ti - qj * tj
