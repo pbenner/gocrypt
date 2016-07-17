@@ -77,9 +77,17 @@ func main() {
     for j := 0; j <= 0xFF; j++ {
       b.Terms[0] = byte(j)
       f.Add(r, a, b)
-      aesMixColAdd[i][j] = r.Terms[0]
+      if len(r.Terms) == 0 {
+        aesMixColAdd[i][j] = 0
+      } else {
+        aesMixColAdd[i][j] = r.Terms[0]
+      }
       f.Mul(r, a, b)
-      aesMixColMul[i][j] = r.Terms[0]
+      if len(r.Terms) == 0 {
+        aesMixColMul[i][j] = 0
+      } else {
+        aesMixColMul[i][j] = r.Terms[0]
+      }
     }
   }
   printTable("aesMixColAdd", aesMixColAdd)
