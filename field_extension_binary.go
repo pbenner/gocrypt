@@ -22,56 +22,56 @@ package gocrypt
 
 /* -------------------------------------------------------------------------- */
 
-type BinaryFieldExtension struct {
+type BinaryExtensionField struct {
   IP *BinaryPolynomial
 }
 
 /* -------------------------------------------------------------------------- */
 
-func NewBinaryFieldExtension(ip *BinaryPolynomial) BinaryFieldExtension {
-  return BinaryFieldExtension{ip}
+func NewBinaryExtensionField(ip *BinaryPolynomial) BinaryExtensionField {
+  return BinaryExtensionField{ip}
 }
 
 /* -------------------------------------------------------------------------- */
 
-func (f BinaryFieldExtension) Add(r, a, b *BinaryPolynomial) *BinaryPolynomial {
+func (f BinaryExtensionField) Add(r, a, b *BinaryPolynomial) *BinaryPolynomial {
   r.Add(a, b)
   return r
 }
 
-func (f BinaryFieldExtension) Sub(r, a, b *BinaryPolynomial) *BinaryPolynomial {
+func (f BinaryExtensionField) Sub(r, a, b *BinaryPolynomial) *BinaryPolynomial {
   r.Sub(a, b)
   return r
 }
 
-func (f BinaryFieldExtension) Mul(r, a, b *BinaryPolynomial) *BinaryPolynomial {
+func (f BinaryExtensionField) Mul(r, a, b *BinaryPolynomial) *BinaryPolynomial {
   r.Mul(a, b)
   r.Mod(r, f.IP)
   return r
 }
 
-func (f BinaryFieldExtension) Div(r, a, b *BinaryPolynomial) *BinaryPolynomial {
+func (f BinaryExtensionField) Div(r, a, b *BinaryPolynomial) *BinaryPolynomial {
   _, _, t := BinaryPolynomialEEA(f.IP, b)
   r.Mul(a, t)
   return r
 }
 
-func (f BinaryFieldExtension) Zero() *BinaryPolynomial {
+func (f BinaryExtensionField) Zero() *BinaryPolynomial {
   r := NewBinaryPolynomial(0)
   return r
 }
 
-func (f BinaryFieldExtension) One() *BinaryPolynomial {
+func (f BinaryExtensionField) One() *BinaryPolynomial {
   r := NewBinaryPolynomial(1)
   r.AddTerm(1, 0)
   return r
 }
 
-func (f BinaryFieldExtension) IsZero(a *BinaryPolynomial) bool {
+func (f BinaryExtensionField) IsZero(a *BinaryPolynomial) bool {
   return len(a.Terms) == 0
 }
 
-func (f BinaryFieldExtension) IsOne(a *BinaryPolynomial) bool {
+func (f BinaryExtensionField) IsOne(a *BinaryPolynomial) bool {
   if len(a.Terms) >= 1 {
     if a.Terms[0] != 1 {
       return false
