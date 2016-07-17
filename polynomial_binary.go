@@ -196,14 +196,23 @@ func (r *BinaryPolynomial) Sub(a, b *BinaryPolynomial) {
 /* -------------------------------------------------------------------------- */
 
 func (r *BinaryPolynomial) Mul(a, b *BinaryPolynomial) {
-  for i := len(a.Terms); i > 0; i-- {
+  n := len(a.Terms)
+  m := len(b.Terms)
+  if n < m {
+    a, b = b, a
+    n, m = m, n
+  }
+  r.Resize(n+m-1)
+  for i := n+m-1; i > 0; i-- {
     t := byte(0)
     for j := 8; j > 0; j-- {
       k := 8*(i-1) + (j-1)
       s := 0
-      for k1 := 0; k1 <= k; k1++ {
-        k2 := k-k1
-        if a.Terms[k1/8] & (1 << byte(k1%8)) != 0 && a.Terms[k2/8] & (1 << byte(k2%8)) != 0 {
+      for k2 := 0; k2 <= k && k2/8 < m; k2++ {
+        k1 := k-k2
+        if k1/8 < n &&
+           a.Terms[k1/8] & (1 << byte(k1%8)) != 0 &&
+           b.Terms[k2/8] & (1 << byte(k2%8)) != 0 {
           s++
         }
       }
