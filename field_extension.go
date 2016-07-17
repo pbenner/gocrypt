@@ -83,24 +83,3 @@ func (f ExtensionField) IsOne(a *Polynomial) bool {
   }
   return false
 }
-
-/* -------------------------------------------------------------------------- */
-
-func (p *Polynomial) ReadByte(b byte) {
-  p.SetZero()
-  for i := 0; i < 8; i ++ {
-    if b & (1 << byte(i)) != 0 {
-      p.AddTerm(p.Field.One(), i)
-    }
-  }
-}
-
-func (p *Polynomial) WriteByte() byte {
-  b := byte(0)
-  for k, _ := range p.Terms {
-    if k < 8 {
-      b |= (1 << byte(k))
-    }
-  }
-  return b
-}

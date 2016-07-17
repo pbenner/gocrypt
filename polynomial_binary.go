@@ -21,7 +21,6 @@ package gocrypt
 import "fmt"
 import "bufio"
 import "bytes"
-import "sort"
 
 /* -------------------------------------------------------------------------- */
 
@@ -74,7 +73,6 @@ func (r *BinaryPolynomial) Exponents() []int {
       }
     }
   }
-  sort.Sort(sort.Reverse(sort.IntSlice(exponents)))
   return exponents
 }
 
@@ -277,8 +275,10 @@ func (r *BinaryPolynomial) String() string {
   var buffer bytes.Buffer
   writer := bufio.NewWriter(&buffer)
 
+  if r.Equals(NewBinaryPolynomial(0)) {
+    fmt.Fprintf(writer, "0")
+  }
   first := true
-
   for i := len(r.Terms); i > 0; i-- {
     for j := 8; j > 0; j-- {
       if r.Terms[i-1] & (1 << byte(j-1)) != 0 {
@@ -287,7 +287,11 @@ func (r *BinaryPolynomial) String() string {
         } else {
           fmt.Fprintf(writer, " + ")
         }
-        fmt.Fprintf(writer, "x^%d", 8*(i-1)+(j-1))
+        if e := 8*(i-1)+(j-1); e == 0 {
+          fmt.Fprintf(writer, "1")
+        } else {
+          fmt.Fprintf(writer, "x^%d", e)
+        }
       }
     }
   }

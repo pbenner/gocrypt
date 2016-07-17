@@ -28,27 +28,26 @@ func TestAES1(t *testing.T) {
   m := ByteMatrix(Bits{}.Read("10001111 11000111 11100011 11110001 11111000 01111100 00111110 00011111"))
   v := ByteVector(Bits{}.Read("01100011")[0])
 
-  pf := NewPrimeField(2)
-
   // irreducible polynomial
-  p := NewPolynomial(pf)
+  p := NewBinaryPolynomial(1)
   p.AddTerm(1, 8)
   p.AddTerm(1, 4)
   p.AddTerm(1, 3)
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
 
-  f := NewExtensionField(p)
+  f := NewBinaryExtensionField(p)
 
-  a := NewPolynomial(pf)
+  a := NewBinaryPolynomial(1)
+  b := NewBinaryPolynomial(1)
+  r := NewBinaryPolynomial(1)
   a.AddTerm(1, 0)
 
   for i := 0; i <= 0xFF; i++ {
-    b := NewPolynomial(pf)
-    b.ReadByte(byte(i))
+    b.Terms[0] = byte(i)
 
-    r := f.Div(a, b)
-    y := ByteVaddV(ByteMmulV(m, ByteVector(r.WriteByte())), v)
+    f.Div(r, a, b)
+    y := ByteVaddV(ByteMmulV(m, ByteVector(r.Terms[0])), v)
 
     if byte(y) != aesSbox[i] {
       t.Error("finite field aes s-box test failed")

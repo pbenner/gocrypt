@@ -53,30 +53,33 @@ func printTable(name string, table [][]byte) {
 func main() {
 
   // precompute addition and multiplication in GF(2^8)
-  pf := NewPrimeField(2)
+
   // irreducible polynomial
-  p := NewPolynomial(pf)
+  p := NewBinaryPolynomial(1)
   p.AddTerm(1, 8)
   p.AddTerm(1, 4)
   p.AddTerm(1, 3)
   p.AddTerm(1, 1)
   p.AddTerm(1, 0)
   // create GF(2^8) with irriducible polynomial p
-  f := NewExtensionField(p)
-
+  f := NewBinaryExtensionField(p)
+  // field elements
+  a := NewBinaryPolynomial(1)
+  b := NewBinaryPolynomial(1)
+  r := NewBinaryPolynomial(1)
   // allocate memory and compute results
   aesMixColAdd := make([][]byte, 0xFF+1)
   aesMixColMul := make([][]byte, 0xFF+1)
   for i := 0; i <= 0xFF; i++ {
     aesMixColAdd[i] = make([]byte, 0xFF+1)
     aesMixColMul[i] = make([]byte, 0xFF+1)
-    a := NewPolynomial(pf)
-    a.ReadByte(byte(i))
+    a.Terms[0] = byte(i)
     for j := 0; j <= 0xFF; j++ {
-      b := NewPolynomial(pf)
-      b.ReadByte(byte(j))
-      aesMixColAdd[i][j] = f.Add(a, b).WriteByte()
-      aesMixColMul[i][j] = f.Mul(a, b).WriteByte()
+      b.Terms[0] = byte(j)
+      f.Add(r, a, b)
+      aesMixColAdd[i][j] = r.Terms[0]
+      f.Mul(r, a, b)
+      aesMixColMul[i][j] = r.Terms[0]
     }
   }
   printTable("aesMixColAdd", aesMixColAdd)
